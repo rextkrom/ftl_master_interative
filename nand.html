@@ -218,16 +218,20 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+        .badge-intro { background: #dcfce7; color: #166534; }
         .badge-phys { background: #cffafe; color: #155e75; }
         .badge-level { background: #dbeafe; color: #1e40af; }
         .badge-bics { background: #fef3c7; color: #92400e; }
         .badge-bus { background: #ede9fe; color: #5b21b6; }
         .badge-noise { background: #fee2e2; color: #991b1b; }
+        .badge-interview { background: #f3e8ff; color: #6b21a8; }
+        [data-theme="dark"] .badge-intro { background: #064e3b; color: #a7f3d0; }
         [data-theme="dark"] .badge-phys { background: #164e63; color: #a5f3fc; }
         [data-theme="dark"] .badge-level { background: #1e3a8a; color: #bfdbfe; }
         [data-theme="dark"] .badge-bics { background: #78350f; color: #fde68a; }
         [data-theme="dark"] .badge-bus { background: #4c1d95; color: #ddd6fe; }
         [data-theme="dark"] .badge-noise { background: #7f1d1d; color: #fecaca; }
+        [data-theme="dark"] .badge-interview { background: #581c87; color: #e9d5ff; }
 
         h2.section-header {
             font-size: 1.5rem;
@@ -262,6 +266,10 @@
         .callout-info { background: var(--primary-light); border-color: var(--primary); }
         .callout-warn { background: var(--warning-bg); border-color: var(--warning); }
         .callout-success { background: var(--success-bg); border-color: var(--success); }
+        .callout-interview {
+            background: linear-gradient(to right, rgba(139, 92, 246, 0.08), rgba(8, 145, 178, 0.08));
+            border-color: var(--accent);
+        }
         .callout-title {
             font-weight: 700;
             margin-bottom: 0.35rem;
@@ -506,28 +514,16 @@
             100% { box-shadow: var(--shadow); }
         }
 
-        footer {
-            border-top: 1px solid var(--border);
-            background: var(--surface);
-            padding: 2rem 1.25rem;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-    
         /* ===== Mobile Responsive (iPhone etc.) ===== */
         html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
         body { overflow-x: hidden; }
         img, canvas, table, pre { max-width: 100%; }
         .grid-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
-        .portal-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); }
-        .roadmap-steps { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
-        .card, .portal-card, .sim-container, .quiz-question-box, .info-card { min-width: 0; }
-        .card *, .portal-card * { overflow-wrap: anywhere; word-break: keep-all; }
+        .card, .sim-container, .quiz-question-box { min-width: 0; }
+        .card *, .sim-container * { overflow-wrap: anywhere; word-break: keep-all; }
         .diagram-box, .diagram-box * { overflow-wrap: normal; word-break: normal; }
         .table-responsive table { min-width: 560px; }
         .table-responsive td, .table-responsive th { word-break: keep-all; overflow-wrap: break-word; }
-        canvas { height: auto; }
 
         @media (max-width: 768px) {
             .header-top { flex-wrap: wrap; padding: 0.6rem 0.9rem; gap: 0.5rem; padding-top: max(0.6rem, env(safe-area-inset-top)); }
@@ -538,7 +534,7 @@
             nav.tabs-nav { padding: 0 0.6rem; }
             button.tab-btn { font-size: 0.82rem; padding: 0.65rem 0.6rem; }
             main { margin: 1rem auto 2rem auto; padding: 0 0.75rem; padding-left: max(0.75rem, env(safe-area-inset-left)); padding-right: max(0.75rem, env(safe-area-inset-right)); }
-            .card, .portal-card, .sim-container, .info-card { padding: 1rem; border-radius: 10px; }
+            .card, .sim-container { padding: 1rem; border-radius: 10px; }
             .quiz-question-box { padding: 1.1rem; }
             .card-title { font-size: 1.05rem; }
             .card-header { flex-direction: column; gap: 0.4rem; }
@@ -551,10 +547,6 @@
             th, td { padding: 0.55rem 0.65rem; }
             .formula { display: block; white-space: normal; font-size: 0.82rem; }
             .grid-2 { gap: 0.9rem; }
-            .hero-title { font-size: 1.6rem; }
-            .hero-desc { font-size: 0.95rem; }
-            .portal-grid { gap: 1rem; }
-            .card-heading { font-size: 1.25rem; }
             .quiz-header-bar { flex-direction: column; align-items: stretch; }
             .quiz-header-bar > div { text-align: left !important; }
             .quiz-question-title { font-size: 1.02rem; }
@@ -562,10 +554,18 @@
             .sim-controls { gap: 0.5rem; }
             .sim-controls > * { flex: 1 1 auto; }
             .btn-action { padding: 0.6rem 0.9rem; font-size: 0.85rem; justify-content: center; }
-            .nand-block-grid { grid-template-columns: 1fr; }
             .vth-chart, .canvas-wrap { overflow-x: auto !important; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
             .vth-chart canvas, .canvas-wrap canvas { min-width: 640px; }
             footer { padding: 1.25rem 0.9rem; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            padding: 2rem 1.25rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -573,7 +573,7 @@
 
 <header>
     <div class="header-top">
-        <a href="#" class="brand-title" onclick="switchTab('phys'); return false;">
+        <a href="#" class="brand-title" onclick="switchTab('intro'); return false;">
             <span>🔬 NAND Flash 마스터</span>
             <span class="tag">Senior Staff Edition</span>
         </a>
@@ -584,20 +584,127 @@
         </div>
     </div>
     <nav class="tabs-nav">
-        <button class="tab-btn active" id="tab-phys" onclick="switchTab('phys')">🔬 1. 셀 물리 & 구조</button>
-        <button class="tab-btn" id="tab-levels" onclick="switchTab('levels')">📊 2. 셀 레벨(SLC~QLC) & ISPP</button>
-        <button class="tab-btn" id="tab-bics" onclick="switchTab('bics')">🏗️ 3. 3D BiCS 기술 & 다이 구조</button>
-        <button class="tab-btn" id="tab-bus" onclick="switchTab('bus')">⚡ 4. 버스 인터페이스 & 타이밍</button>
-        <button class="tab-btn" id="tab-noise" onclick="switchTab('noise')">⚠️ 5. 물리 결함 & 노이즈</button>
-        <button class="tab-btn" id="tab-char" onclick="switchTab('char')">🎖️ 6. 낸드 특성화 & 펌웨어 협업</button>
-        <button class="tab-btn" id="tab-sim" onclick="switchTab('sim')">🎮 7. 인터랙티브 시뮬레이터</button>
-        <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">🎯 8. 실전 모의고사</button>
+        <button class="tab-btn active" id="tab-intro" onclick="switchTab('intro')">🌱 1. 10분 입문 (Zero to Hero)</button>
+        <button class="tab-btn" id="tab-phys" onclick="switchTab('phys')">🔬 2. 셀 물리 & 구조 심화</button>
+        <button class="tab-btn" id="tab-levels" onclick="switchTab('levels')">📊 3. 셀 레벨(SLC~QLC) & ISPP</button>
+        <button class="tab-btn" id="tab-bics" onclick="switchTab('bics')">🏗️ 4. 3D BiCS 기술 & 다이 구조</button>
+        <button class="tab-btn" id="tab-bus" onclick="switchTab('bus')">⚡ 5. 버스 인터페이스 & 타이밍</button>
+        <button class="tab-btn" id="tab-noise" onclick="switchTab('noise')">⚠️ 6. 물리 결함 & 노이즈</button>
+        <button class="tab-btn" id="tab-bridge" onclick="switchTab('bridge')">🎖️ 7. 18년 이력 매핑 & 면접 전략</button>
+        <button class="tab-btn" id="tab-sim" onclick="switchTab('sim')">🎮 8. 인터랙티브 시뮬레이터</button>
+        <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">🎯 9. 실전 모의고사</button>
     </nav>
 </header>
 
 <main>
-    <!-- ==================== TAB 1: CELL PHYSICS & STRUCTURE ==================== -->
-    <div id="phys" class="section active">
+    <!-- ==================== TAB 1: ZERO TO HERO INTRO ==================== -->
+    <div id="intro" class="section active">
+        <div class="pill-list">
+            <a href="#intro-trap" class="pill">비유 1: 미세 유리병과 물높이</a>
+            <a href="#intro-erase" class="pill">비유 2: 왜 덮어쓰기가 안 되는가?</a>
+            <a href="#intro-tree" class="pill">비유 3: 크리스마스 전구 직렬 연결</a>
+            <a href="#intro-terms" class="pill">NAND 핵심 단위 (Cell/Page/Block)</a>
+        </div>
+
+        <div class="card grid-full" id="intro-trap">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-intro">Level 1 • 직관적 비유</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">1. NAND 플래시, 초등학생도 이해하는 3가지 핵심 비유</h2>
+                </div>
+            </div>
+            <p>플래시 메모리가 처음이라도 전혀 걱정하실 필요 없습니다. 복잡한 반도체 양자역학 수식 대신, 일상적인 직관과 <strong>18년 임베디드/센서 공학적 감각</strong>에 빗대어 원리부터 단숨에 꿰뚫어 보겠습니다.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 비유 1. 전자를 가두는 '초미세 유리병(트랩)'과 '물높이 측정기'</div>
+                <p>NAND 플래시의 1개 셀은 <strong>전자를 가두는 뚜껑 달린 작은 유리병(Si3N4 질화막 트랩)</strong>과 같습니다.</p>
+                <ul>
+                    <li><strong>병이 비어 있을 때 (Erase 상태):</strong> 전자가 없으므로 아래쪽 도로(채널)에 전기가 콸콸 잘 통합니다. 디지털 신호로는 <strong>'1'</strong>로 읽습니다.</li>
+                    <li><strong>병에 전자를 채웠을 때 (Program 상태):</strong> 음(-)전하를 띤 전자들이 도로 위를 꽉 막고 있어서, 전기를 통하게 하려면 게이트에 아주 높은 전압(문턱 전압, Vth)을 걸어야만 간신히 도로가 열립니다. 따라서 평소에는 전류가 차단되어 <strong>'0'</strong>으로 읽습니다.</li>
+                    <li><strong>📌 센서 엔지니어링 브릿징:</strong> 마치 <strong>CMOS 이미지 센서(CIS)의 픽셀 포토다이오드</strong>에 빛(광자)이 들어가 전하가 축적되면 전위(전압)가 변하듯이, 낸드 셀 역시 트랩에 전자를 얼마나 채워 넣었느냐에 따라 <strong>문턱 전압(Vth)이 달라지는 원리</strong>입니다!</li>
+                </ul>
+            </div>
+
+            <div class="diagram-box">
+[ 전자가 비어 있을 때 (Erase 상태: '1') ]
+   Control Gate (0V)
+   ─────── [ 빈 트랩 유리병 ] ───────
+   채널 도로: 전기가 저항 없이 콸콸 통함! (Vth 낮음) ➔ 데이터 '1'
+
+[ 전자를 채웠을 때 (Program 상태: '0') ]
+   Control Gate (높은 전압을 걸어야 열림!)
+   ─────── [ e- e- e- 전자 꽉 참 ] ───────
+   채널 도로: 전자들이 전기장을 가로막아 전류 차단! (Vth 높음) ➔ 데이터 '0'
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Metaphor 2 -->
+            <div class="card" id="intro-erase">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-intro">핵심 제약 1</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">2. 왜 덮어쓰기(Overwrite)가 안 되는가?</h2>
+                    </div>
+                </div>
+                <p>RAM이나 하드디스크(자성체)는 그냥 위에 덮어쓰면 되는데, 왜 낸드는 덮어쓰기가 안 될까요?</p>
+                <div class="callout callout-warn">
+                    <div class="callout-title">종이와 표백제 비유</div>
+                    <p>NAND에 데이터를 쓰는 것은 <strong>'지워지지 않는 특수 펜으로 종이에 글씨를 쓰는 것'</strong>과 같습니다. 이미 잉크(전자)가 묻어 있는 종이 위에 다른 글씨를 덮어쓰면 새까맣게 번져서 판독할 수 없습니다.</p>
+                    <p>따라서 반드시 <strong>표백제(고전압 20V 소거)</strong>를 부어 종이를 완전히 백지(Erase, 데이터 1)로 되돌린 후에만 새 글씨를 쓸 수 있습니다. 이것이 바로 FTL이 탄생하게 된 <strong>No In-Place Update</strong>의 물리적 이유입니다.</p>
+                </div>
+            </div>
+
+            <!-- Metaphor 3 -->
+            <div class="card" id="intro-tree">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-intro">핵심 제약 2</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. 왜 지우기는 블록, 읽기/쓰기는 페이지인가?</h2>
+                    </div>
+                </div>
+                <p>왜 수정은 4KB/16KB 단위인데, 지우기는 수백 배 큰 16MB 블록 단위일까요?</p>
+                <div class="callout callout-info">
+                    <div class="callout-title">크리스마스 트리 전구 직렬 연결 비유</div>
+                    <p>NAND는 집적도를 극대화하기 위해 64~128개의 셀을 <strong>한 가닥의 전선에 전구처럼 줄줄이 직렬(String)</strong>로 꿰어 놓았습니다.</p>
+                    <ul>
+                        <li><strong>읽기/쓰기 (Page 단위):</strong> 특정 전구 한 줄(워드라인)에만 전압을 걸어 신호를 넣고 뺍니다.</li>
+                        <li><strong>지우기 (Block 단위):</strong> 전자를 뺄 때는 바닥 기판(P-Well) 전체에 20V 고전압을 통째로 걸어야 하므로, 기판을 공유하는 수천 개의 직렬 줄(블록 전체)이 한꺼번에 일괄 표백됩니다. 4KB 하나만 콕 집어서 지울 수가 없는 구조입니다!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card grid-full" id="intro-terms">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-intro">Terminology</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">4. NAND 플래시 기본 용어 & 구조 계층</h2>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>계층 단위</th><th>크기 (일반적 기준)</th><th>동작 및 성격</th><th>실세계 비유</th></tr>
+                    <tr><td><strong>Cell (셀)</strong></td><td>1개 트랜지스터 (1~4 bits)</td><td>전자를 가두어 1개~16개 전압 상태 표현</td><td>글자 1자</td></tr>
+                    <tr><td><strong>String (스트링)</strong></td><td>64 ~ 256개 직렬 셀</td><td>비트라인(BL)과 접지 사이에 직렬로 연결된 기둥</td><td>글자들을 꿰어놓은 한 가닥 실</td></tr>
+                    <tr><td><strong>Page (페이지)</strong></td><td><strong>4KB, 8KB, 16KB</strong></td><td><strong>읽기(Read) 및 쓰기(Program)의 최소 단위</strong></td><td>노트의 한 페이지 (한 줄씩 씀)</td></tr>
+                    <tr><td><strong>Block (블록)</strong></td><td><strong>4MB ~ 16MB (수백 페이지)</strong></td><td><strong>지우기(Erase)의 최소 단위</strong></td><td>노트 한 권 (통째로 소각/표백)</td></tr>
+                    <tr><td><strong>Plane (플레인)</strong></td><td>수천 개 블록 (독립 버퍼)</td><td>동시에 읽고 쓸 수 있는 독립 구동 어레이 (Dual/Quad)</td><td>독립된 제본 라인</td></tr>
+                    <tr><td><strong>Die (다이)</strong></td><td>512Gb ~ 1Tb 실리콘 칩</td><td>독립적인 CE#(Chip Enable)로 제어되는 단일 칩</td><td>완성된 책 1권</td></tr>
+                </table>
+            </div>
+            <div class="diagram-box">
+[ 요약: 플래시 메모리의 절대 규칙 ]
+1. 읽기(Read)와 쓰기(Program)는 ➔ "페이지(Page)" 단위!
+2. 지우기(Erase)는 ➔ "블록(Block)" 단위!
+3. 이미 쓴 곳에 다시 쓰기(Overwrite)는 ➔ "물리적으로 절대 불가!"
+➔ 이 불일치를 마법처럼 감춰주는 펌웨어가 바로 "FTL"입니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 2: CELL PHYSICS & STRUCTURE ==================== -->
+    <div id="phys" class="section">
         <div class="pill-list">
             <a href="#phys-ctf" class="pill">FG vs CTF 구조 비교</a>
             <a href="#phys-tunneling" class="pill">FN 터널링 (Program/Erase)</a>
@@ -612,7 +719,7 @@
                     <h2 class="card-title" style="margin-top:0.3rem;">1. Floating Gate (FG) vs Charge Trap Flash (CTF)</h2>
                 </div>
             </div>
-            <p>NAND 플래시 셀은 전하를 가두어 트랜지스터의 <strong>문턱 전압(Vth, Threshold Voltage)</strong>을 변화시키는 비휘발성 메모리 소자입니다. 2D Planar 시절 사용되던 <strong>Floating Gate(도체)</strong> 방식과 현대 3D BiCS NAND의 표준인 <strong>Charge Trap Flash(부도체 질화막)</strong> 방식의 차이를 이해하는 것은 미디어 제어의 첫걸음입니다.</p>
+            <p>2D 평면 낸드 시절 사용되던 <strong>Floating Gate(도체)</strong> 방식과 현대 3D BiCS NAND의 표준인 <strong>Charge Trap Flash(부도체 질화막)</strong> 방식의 차이를 이해하는 것은 신뢰성 제어의 출발점입니다.</p>
 
             <div class="table-responsive">
                 <table>
@@ -662,7 +769,7 @@ Silicon Channel         ──── [ Poly-Si (전류가 흐르는 마카로니
                         <h2 class="card-title" style="margin-top:0.3rem;">3. NAND Cell String 직렬 연결 구조</h2>
                     </div>
                 </div>
-                <p>NAND 플래시의 가장 핵심적인 특징은 셀들이 비트라인(Bitline)과 소스라인(Source Line) 사이에 <strong>직렬(In Series)로 연결</strong>되어 있다는 점입니다.</p>
+                <p>NAND 플래시의 핵심적인 구조는 셀들이 비트라인(Bitline)과 소스라인(Source Line) 사이에 <strong>직렬(In Series)로 연결</strong>되어 있다는 점입니다.</p>
                 <div class="diagram-box">
 Bitline (BL)
    │
@@ -705,7 +812,7 @@ Common Source Line (CSL)
         </div>
     </div>
 
-    <!-- ==================== TAB 2: CELL LEVELS & ISPP ==================== -->
+    <!-- ==================== TAB 3: CELL LEVELS & ISPP ==================== -->
     <div id="levels" class="section">
         <div class="pill-list">
             <a href="#level-types" class="pill">SLC, MLC, TLC, QLC 비교</a>
@@ -763,7 +870,7 @@ Program Voltage (Vpgm)
                 <ul>
                     <li><strong>스텝 전압 ($\Delta V_{ISPP}$):</strong> 펄스마다 전압을 약 0.2V~0.4V씩 계단식으로 상승 인가.</li>
                     <li><strong>Program Verify (PV):</strong> 펄스 직후 목표 전압에 도달했는지 확인. 도달한 비트는 비트라인을 Vcc로 올려 추가 프로그래밍을 차단(Inhibit).</li>
-                    <li><strong>엔지니어링 트레이드오프:</strong> $\Delta V_{ISPP}$를 작게 쪼갤수록 Vth 분포 폭이 예리해져 신뢰성이 높아지지만, 반복 루프 횟수가 늘어나 쓰기 속도($t_{PROG}$)가 느려집니다.</li>
+                    <li><strong>카메라 렌즈 조절 비유:</strong> 마치 <strong>오토포커스(AF) 렌즈</strong>를 맞출 때 스텝 모터를 한 번에 돌리지 않고 펄스를 톡톡 주며 콘트라스트 피크를 찾는 피드백 제어와 완벽히 동일합니다.</li>
                 </ul>
             </div>
 
@@ -788,12 +895,12 @@ Program Voltage (Vpgm)
         </div>
     </div>
 
-    <!-- ==================== TAB 3: 3D BICS & DIE ARCHITECTURE ==================== -->
+    <!-- ==================== TAB 4: 3D BICS & DIE ARCHITECTURE ==================== -->
     <div id="bics" class="section">
         <div class="pill-list">
             <a href="#bics-evo" class="pill">3D BiCS 기술 혁신</a>
-            <a href="#bics-tiers" class="pill">Multi-Tier & Bonding 공정</a>
-            <a href="#bics-cua" class="pill">CuA / PUC / CBA 아키텍처</a>
+            <a href="#bics-tiers" class="pill">BiCS 세대별 스펙 (ISSCC/IEDM)</a>
+            <a href="#bics-cua" class="pill">CUA vs CBA 하이브리드 본딩</a>
             <a href="#bics-planes" class="pill">Multi-Plane & 다이 병렬 구조</a>
         </div>
 
@@ -852,7 +959,7 @@ Program Voltage (Vpgm)
                 </div>
                 <div class="callout callout-success">
                     <div class="callout-title">2단계: CBA (CMOS Directly Bonded to Array) - BiCS8 표준</div>
-                    <p><strong>로직 CMOS 웨이퍼</strong>와 <strong>3D 낸드 메모리 셀 웨이퍼</strong>를 완전히 분리하여 각각 가장 진보된 최적 공정 노드에서 제조한 뒤, 웨이퍼 상태에서 <strong>Cu-to-Cu(구리 대 구리) 다이렉트 하이브리드 본딩</strong>으로 결합합니다. 이를 통해 주변 회로의 속도(최대 4.8Gbps)와 셀 어레이의 신뢰성을 동시에 독립적으로 극대화했습니다.</p>
+                    <p><strong>로직 CMOS 웨이퍼</strong>와 <strong>3D 낸드 메모리 셀 웨이퍼</strong>를 완전히 분리하여 각각 가장 진보된 최적 공정 노드에서 제조한 뒤, 웨이퍼 상태에서 <strong>Cu-to-Cu(구리 대 구리) 다이렉트 하이브리드 본딩</strong>으로 결합합니다. (스마트폰 카메라 모듈의 <strong>Stacked CIS 센서</strong>와 정확히 같은 원리입니다!)</p>
                 </div>
             </div>
         </div>
@@ -872,7 +979,7 @@ Program Voltage (Vpgm)
         </div>
     </div>
 
-    <!-- ==================== TAB 4: BUS INTERFACE & TIMING ==================== -->
+    <!-- ==================== TAB 5: BUS INTERFACE & TIMING ==================== -->
     <div id="bus" class="section">
         <div class="pill-list">
             <a href="#bus-protocols" class="pill">Toggle DDR vs ONFI 표준</a>
@@ -966,7 +1073,7 @@ Program Voltage (Vpgm)
         </div>
     </div>
 
-    <!-- ==================== TAB 5: NOISE & RELIABILITY ==================== -->
+    <!-- ==================== TAB 6: NOISE & RELIABILITY ==================== -->
     <div id="noise" class="section">
         <div class="pill-list">
             <a href="#noise-retention" class="pill">Data Retention & Arrhenius</a>
@@ -1043,41 +1150,85 @@ Program Voltage (Vpgm)
         </div>
     </div>
 
-    <!-- ==================== TAB 6: CHARACTERIZATION & FMC ==================== -->
-    <div id="char" class="section">
+    <!-- ==================== TAB 7: 18-YEAR CAREER BRIDGE & INTERVIEW ==================== -->
+    <div id="bridge" class="section">
         <div class="pill-list">
-            <a href="#char-shmoo" class="pill">Shmoo Plot & RBER 모델링</a>
-            <a href="#char-valley" class="pill">Valley Search & 최적 Vref 탐색</a>
-            <a href="#char-fmc" class="pill">FMC 컨트롤러 & PHY 분리</a>
-            <a href="#char-fbbm" class="pill">Factory Bad Block & Defect 리맵핑</a>
-            <a href="#char-python" class="pill">Python 낸드 특성화 프레임워크</a>
+            <a href="#bridge-table" class="pill">18년 임베디드 이력 ➔ NAND 매핑</a>
+            <a href="#bridge-valley" class="pill">Valley Search & 최적 Vref 알고리즘</a>
+            <a href="#bridge-fmc" class="pill">FMC 컨트롤러 & PHY 분리</a>
+            <a href="#bridge-qa" class="pill">NAND 시니어 인터뷰 TOP 5 모범 답변</a>
+            <a href="#bridge-python" class="pill">Python 낸드 특성화 프레임워크</a>
         </div>
 
-        <div class="card grid-full" id="char-shmoo">
+        <div class="card grid-full" id="bridge-table">
             <div class="card-header">
                 <div>
-                    <span class="card-badge badge-phys">Senior Staff Characterization</span>
-                    <h2 class="card-title" style="margin-top:0.3rem;">1. NAND 특성화(Characterization)와 RBER 모델링</h2>
+                    <span class="card-badge badge-interview">Senior Staff Career Strategy</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">김회원 님의 18년 임베디드/센서 실적 ➔ NAND 미디어 엔지니어링 1:1 매핑</h2>
                 </div>
             </div>
-            <p>시니어 스태프 펌웨어 엔지니어는 낸드 제조사(SanDisk Fab)로부터 전달받은 원시 실리콘 다이의 전기적 특성을 소프트웨어 파라미터로 모델링해야 합니다.</p>
-            <div class="grid-2">
-                <div>
-                    <h3 class="sub-header">📈 Shmoo Plot (동작 마진 맵핑)</h3>
-                    <p>인가 전압(Vcc, Vpgm, Vread)과 동작 주파수/타이밍(tSetup, tHold, tWHR)의 축을 변화시키며 낸드가 에러 없이 동작하는 안전 구역(Pass/Fail Matrix)을 맵핑하여 펌웨어의 최악 마진(Worst-case Margin)을 산정합니다.</p>
-                </div>
-                <div>
-                    <h3 class="sub-header">📉 RBER Bathtub Curve (욕조 곡선)</h3>
-                    <p>초기 유아 사망(Infant Mortality) 결함 ➔ 안정적인 정상 구동 구간 ➔ 수명 고갈에 따른 RBER 기하급수적 급증 구간을 수학적으로 모델링하여 LDPC ECC 엔진의 Soft-decision 임계치와 맞바꿉니다.</p>
-                </div>
+            <p>면접관에게 <em>"낸드 코드를 짜본 적은 없지만, 지난 18년간 수행해 온 센서 서브밀리초 타이밍 동기화, ASIC 시뮬레이터 모델링, 이종 코어 피드백 제어, 40만 프레임 Aging 무결점 검증 역량이 낸드 미디어 제어와 완벽하게 일치한다"</em>는 점을 명쾌하게 증명하는 전략 매핑 표입니다.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th style="width:45%;">김회원 님의 검증된 18년 실무 실적</th>
+                        <th style="width:55%;">NAND Flash 미디어 엔지니어링 핵심 과제</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>1. 삼성전자 CIS 센서 서브밀리초 타이밍 동기화 & 실리콘 회로팀 협업</strong><br>
+                            - 자이로 센서 데이터와 이미지 센서 롤링 셔터 노출 타이밍을 서브밀리초 단위로 센서 실리콘에서 직접 동기화<br>
+                            - ASIC C/C++ 사이클 시뮬레이터 모델링 검증
+                        </td>
+                        <td>
+                            <strong>FMC 플래시 버스 DQS/타이밍 인터페이스 제어 & 시퀀서 최적화</strong><br>
+                            - Toggle DDR / ONFI 버스의 DQS 차동 스트로브 나노초 타이밍 튜닝<br>
+                            - Shmoo Plot 기반 낸드 실리콘 전압-타이밍 마진 맵핑 및 최악 조건(Corner-case) 안정성 확보
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>2. TI TDA4 이종 코어 비동기 피드백 매니저 (`SvVxOutputFeedbackManager`) 설계</strong><br>
+                            - TIOVX 그래프 환경에서 프레임 지연 및 timing race condition을 방어하는 피드백 제어 루프 아키텍처 설계
+                        </td>
+                        <td>
+                            <strong>ISPP Program Verify 피드백 제어 & Dynamic Valley Search</strong><br>
+                            - 계단식 전압 펄스(ISPP)의 실시간 PV 판정 및 채널 차단(Inhibit) 제어<br>
+                            - 에러 기울기를 실시간 피드백 받아 최적 Vref를 고속 수렴하는 Valley Tracking 알고리즘
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>3. 40만 8,737 프레임 (5시간 이상) 무결점 타깃 보드 Aging 스트레스 테스트</strong><br>
+                            - 스마트 포인터 누수 차단, Zero Crash 달성<br>
+                            - 정적 버퍼 풀링으로 런타임 메모리 단편화 원천 배제
+                        </td>
+                        <td>
+                            <strong>NAND 가혹 고온 Retention/Disturb Aging 테스트 & 결함 격리</strong><br>
+                            - 챔버 고온 가속 수명 시험(HTOL) 중 셀 전하 누설과 RBER 급증 방어<br>
+                            - 런타임 배드 블록(Runtime BBT) 및 Defect Column 치환의 결정론적 무결성 검증
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>4. 삼성테크윈 DSP 하드웨어 가속기 IP 레지스터 직접 제어 & RTOS 포팅</strong><br>
+                            - ThreadX, VxWorks, T-Kernel, 리눅스 환경에서 전용 HW 가속기 레지스터 직접 튜닝
+                        </td>
+                        <td>
+                            <strong>Flash Memory Controller (FMC) 온칩 가속기 오프로딩</strong><br>
+                            - CPU 비트뱅잉 배제, Command Descriptor 큐잉 및 Hardware Direct Flash DMA 제어
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
 
         <!-- Valley Search Algorithm -->
-        <div class="card grid-full" id="char-valley">
+        <div class="card grid-full" id="bridge-valley">
             <div class="card-header">
                 <div>
-                    <span class="card-badge badge-phys">Advanced Firmware Algorithm</span>
+                    <span class="card-badge badge-interview">Advanced Algorithm</span>
                     <h2 class="card-title" style="margin-top:0.3rem;">2. Valley Search (계곡 탐색) & Predictive Vref 알고리즘</h2>
                 </div>
             </div>
@@ -1085,7 +1236,7 @@ Program Voltage (Vpgm)
             <div class="grid-2">
                 <div>
                     <h3 class="sub-header">🔍 Valley Search 원리</h3>
-                    <p>인접한 두 문턱 전압(Vth) 분포가 겹치는 영역의 비트 반전 빈도를 실시간 카운트하여, 미분 기울기($\frac{d(\text{Error})}{dV} = 0$)가 0이 되는 극솟값(Valley)을 이분 탐색(Binary Search)이나 Proximity Search로 수 스텝 내에 고속 수렴시킵니다.</p>
+                    <p>인접한 두 문턱 전압(Vth) 분포가 겹치는 영역의 비트 반전 빈도를 실시간 카운트하여, 미분 기울기($\frac{d(\text{Error})}{dV} = 0$)가 0이 되는 극솟값(Valley)을 이분 탐색(Binary Search)이나 Proximity Search로 수 스텝 내에 고속 수렴시킵니다. (마치 <strong>영상 처리에서 Otsu 이진화 임계값을 찾는 히스토그램 계곡 탐색</strong>과 수학적으로 완벽히 동일합니다!)</p>
                 </div>
                 <div>
                     <h3 class="sub-header">🧠 Predictive Local Offset Caching</h3>
@@ -1096,10 +1247,10 @@ Program Voltage (Vpgm)
 
         <div class="grid-2">
             <!-- FMC -->
-            <div class="card" id="char-fmc">
+            <div class="card" id="bridge-fmc">
                 <div class="card-header">
                     <div>
-                        <span class="card-badge badge-phys">Hardware/Firmware Boundary</span>
+                        <span class="card-badge badge-interview">Hardware/Firmware Boundary</span>
                         <h2 class="card-title" style="margin-top:0.3rem;">3. Flash Memory Controller (FMC)와 FTL 분리</h2>
                     </div>
                 </div>
@@ -1111,10 +1262,10 @@ Program Voltage (Vpgm)
             </div>
 
             <!-- Bad Block -->
-            <div class="card" id="char-fbbm">
+            <div class="card" id="bridge-fbbm">
                 <div class="card-header">
                     <div>
-                        <span class="card-badge badge-phys">Factory Defect Handling</span>
+                        <span class="card-badge badge-interview">Factory Defect Handling</span>
                         <h2 class="card-title" style="margin-top:0.3rem;">4. Factory Bad Block (FBBM) & Defect Column 리맵핑</h2>
                     </div>
                 </div>
@@ -1125,11 +1276,46 @@ Program Voltage (Vpgm)
             </div>
         </div>
 
-        <!-- Python Characterization Code -->
-        <div class="card grid-full" id="char-python">
+        <!-- Senior Staff NAND Interview Q&A -->
+        <div class="card grid-full" id="bridge-qa">
             <div class="card-header">
                 <div>
-                    <span class="card-badge badge-phys">Python Engineering Tool</span>
+                    <span class="card-badge badge-interview">NAND Interview Q&A</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">시니어 스태프 낸드 미디어 면접 핵심 질문 TOP 5 & 모범 답변</h2>
+                </div>
+            </div>
+
+            <div class="callout callout-interview">
+                <div class="callout-title">Q1. "낸드 플래시 펌웨어를 직접 다뤄보지 않았는데, 미디어 엔지니어링 팀을 어떻게 기술 리드할 수 있는가?"</div>
+                <p><strong>[모범 답변]:</strong> "낸드 미디어 엔지니어링의 본질은 결국 <em>'아날로그 실리콘 소자의 비선형적 노이즈(전압 이동, 온도, 열화)를 하드웨어 타이밍 동기화와 디지털 피드백 알고리즘으로 보정하여 완벽한 신뢰성을 이끌어내는 시스템 제어 공학'</em>입니다. 저는 삼성전자에서 CMOS 이미지 센서의 서브밀리초 노출 타이밍을 실리콘 회로와 직접 동기화하고, 18년간 DSP/가속기 레지스터 직접 제어와 40만 프레임 Aging 무결점 검증을 완수한 경험이 있습니다. 낸드 물리 특성을 소프트웨어 파라미터로 추상화하고 FMC 시퀀서를 최적화하는 데 즉각적인 리더십을 발휘할 수 있습니다."</p>
+            </div>
+
+            <div class="callout callout-interview">
+                <div class="callout-title">Q2. "TLC/QLC 낸드에서 P/E 사이클 마모로 RBER이 치솟을 때, Valley Search 알고리즘을 펌웨어에 어떻게 탑재하겠는가?"</div>
+                <p><strong>[모범 답변]:</strong> "고정된 RRT 순차 탐색 대신, 2단계 하이브리드 탐색을 적용하겠습니다. 첫째, 동일 블록 내 인접 WL의 최근 성공 Vref를 캐싱하는 <strong>Predictive Local Offset Caching</strong>을 통해 80% 이상의 읽기를 1회에 성공시킵니다. 둘째, 캐시 미스 시에는 에러 비트 수의 2차 미분 기울기 기반 이분 탐색(Binary Valley Search)을 수행하여 단 2~3회 시도 만에 Vopt 극솟점으로 수렴시키고, 복구 즉시 Read Reclaim 워커를 깨워 안전 블록으로 데이터를 이주시킵니다."</p>
+            </div>
+
+            <div class="callout callout-interview">
+                <div class="callout-title">Q3. "BiCS8 218단에 적용된 CBA(CMOS Directly Bonded to Array) 기술이 컨트롤러 펌웨어 설계에 주는 영향은?"</div>
+                <p><strong>[모범 답변]:</strong> "CBA는 로직 웨이퍼와 셀 웨이퍼가 분리 제조되어 I/O 속도가 최대 3.2~4.8 Gbps로 비약적으로 향상되었습니다. 펌웨어 관점에서는 낸드 버스 전송 시간(tBus)이 극적으로 줄어들어 $t_{PROG}$ 및 $t_R$과의 비대칭성이 더욱 심화됩니다. 따라서 FMC의 커맨드 디스크립터 큐잉과 Dual-Plane/Quad-Plane 인터리빙을 더욱 공격적으로 스케줄링하고, Cache Program/Read 오버랩을 극대화하여 버스 유휴 시간을 없애는 파이프라인 설계가 필수적입니다."</p>
+            </div>
+
+            <div class="callout callout-interview">
+                <div class="callout-title">Q4. "85°C 고온 환경에서 Data Retention 열화로 인한 셀 전하 누설을 펌웨어 관점에서 어떻게 능동 방어하겠는가?"</div>
+                <p><strong>[모범 답변]:</strong> "컨트롤러 온칩 서멀 센서와 연동하여 동작 온도를 실시간 누적 모니터링하는 <strong>온도 가중치 타이머(Temperature-Weighted Retention Tracker)</strong>를 구동합니다. 고온 누적 시간이 임계치에 도달하면 유휴(Idle) 시간에 백그라운드 Retention Scan을 선제 가동하여, Vth가 좌측으로 이동한 블록을 감지하고 LDPC UECC가 터지기 전에 미리 새 블록으로 복사하는 Data Refresh를 스케줄링합니다."</p>
+            </div>
+
+            <div class="callout callout-interview">
+                <div class="callout-title">Q5. "공장에서 출하된 Initial Bad Block(FBBM)과 사용 중 발생하는 Runtime Bad Block을 구별하여 처리하는 원칙은?"</div>
+                <p><strong>[모범 답변]:</strong> "초기 공장 배드 블록(FBBM)은 웨이퍼 결함으로 스페어 영역 특정 바이트에 마킹되어 있으므로, 펌웨어 최초 부팅 시 절대로 Erase 명령을 내리지 않고 스캔하여 비휘발성 BBT 메타 블록에 영구 등록합니다. 반면 런타임 배드 블록은 P/E 수행 중 낸드 Status Register(70h)가 Fail을 반환할 때 검출되며, 즉시 해당 블록을 BBT에 격리 등록하고 예비 블록 풀(Reserve Pool)의 정상 블록으로 쓰기 데이터를 즉각 리다이렉트합니다."</p>
+            </div>
+        </div>
+
+        <!-- Python Characterization Code -->
+        <div class="card grid-full" id="bridge-python">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-interview">Python Engineering Tool</span>
                     <h2 class="card-title" style="margin-top:0.3rem;">5. Python 기반 NAND 물리 특성화 & RBER Shmoo 분석 스크립트</h2>
                 </div>
             </div>
@@ -1162,7 +1348,6 @@ Program Voltage (Vpgm)
 <span style="color:#64748b;"># 실제 사용 예시:</span>
 char = NandCharacterizer(die_id=0, block_id=128)
 <span style="color:#38bdf8;">for</span> v <span style="color:#38bdf8;">in</span> range(-20, 21, 5):
-    <span style="color:#64748b;"># 하드웨어 테스트 벤치로부터 에러 비트 수 획득</span>
     errors = int(120 + 0.45 * (v - (-5))**2)
     char.record_sweep_point(vref_mv=v, bit_errors=errors)
 
@@ -1172,7 +1357,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
         </div>
     </div>
 
-    <!-- ==================== TAB 7: SIMULATOR ==================== -->
+    <!-- ==================== TAB 8: SIMULATOR ==================== -->
     <div id="sim" class="section">
         <h2 class="section-header">🎮 NAND Flash 물리 & 인터페이스 시뮬레이터</h2>
 
@@ -1230,7 +1415,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
         </div>
     </div>
 
-    <!-- ==================== TAB 8: QUIZ ==================== -->
+    <!-- ==================== TAB 9: QUIZ ==================== -->
     <div id="quiz" class="section">
         <div class="quiz-panel">
             <div class="quiz-header-bar">
@@ -1250,6 +1435,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             <!-- Category Filter -->
             <div class="filter-group">
                 <button class="filter-btn active" onclick="setNandCatFilter('all', this)">전체 모의고사</button>
+                <button class="filter-btn" onclick="setNandCatFilter('intro', this)">입문 기초</button>
                 <button class="filter-btn" onclick="setNandCatFilter('phys', this)">셀 물리 & 구조</button>
                 <button class="filter-btn" onclick="setNandCatFilter('levels', this)">SLC~QLC & ISPP</button>
                 <button class="filter-btn" onclick="setNandCatFilter('bics', this)">3D BiCS 다이 구조</button>
@@ -1278,7 +1464,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
                 <p id="nand-session-score" style="font-size:1.1rem; color:var(--text); margin-bottom:1.5rem;">10문제 중 9문제 정답 (정답률 90%)</p>
                 <div style="display:flex; justify-content:center; gap:0.75rem;">
                     <button class="btn-action" onclick="startNandSession()">새로운 세션 시작 🔄</button>
-                    <button class="btn-action btn-secondary" onclick="switchTab('phys')">개념 복습하러 가기 📖</button>
+                    <button class="btn-action btn-secondary" onclick="switchTab('intro')">개념 복습하러 가기 📖</button>
                 </div>
             </div>
         </div>
@@ -1347,9 +1533,59 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
        2. NAND QUESTION BANK (28 COMPREHENSIVE QUESTIONS)
        ========================================================================== */
     const nandQuestionBank = [
-        // --- Category: phys (셀 물리 & 구조 1~6) ---
+        // --- Category: intro (입문 기초 101~104) ---
         {
-            id: 101, category: "phys", catLabel: "셀 구조",
+            id: 101, category: "intro", catLabel: "입문 개념",
+            q: "NAND 플래시에서 이미 데이터가 기록된 셀에 새로운 데이터를 덮어쓰지(Overwrite) 못하고 반드시 블록 소거(Erase)가 선행되어야 하는 물리적 이유는?",
+            options: [
+                "NAND 컨트롤러의 전송 클럭이 너무 느리기 때문에",
+                "이미 전자가 차 있는 트랩 위에 전자를 더 넣으면 전압이 뭉개지므로, 20V 고전압으로 전자를 완전히 빼내 백지(Erase, '1') 상태로 만든 후에만 새 전자를 주입할 수 있기 때문에",
+                "운영체제의 NTFS 파일시스템 규격이 덮어쓰기를 금지하고 있기 때문에",
+                "DRAM 캐시 메모리의 용량이 부족하기 때문에"
+            ],
+            ans: 1, tab: "intro", ref: "intro-erase",
+            exp: "NAND 셀은 전자를 빼내는 소거(Erase)를 통해 백지 상태로 만든 후에만 전자를 주입하는 프로그램(Program)이 가능하여 물리적으로 덮어쓰기가 불가능합니다."
+        },
+        {
+            id: 102, category: "intro", catLabel: "연산 단위",
+            q: "NAND 플래시 메모리의 읽기/쓰기 단위와 지우기 단위의 올바른 조합은?",
+            options: [
+                "읽기/쓰기는 블록(Block), 지우기는 페이지(Page)",
+                "읽기/쓰기는 바이트(Byte), 지우기는 섹터(Sector)",
+                "읽기/쓰기는 페이지(Page, 약 16KB), 지우기는 블록(Block, 약 16MB)",
+                "읽기/쓰기/지우기 모두 동일한 워드(Word) 단위"
+            ],
+            ans: 2, tab: "intro", ref: "intro-terms",
+            exp: "NAND는 한 줄(Page) 단위로 읽고 쓰지만, 지울 때는 P-Well 기판 전체에 고전압을 걸어 블록(Block, 수백 페이지) 단위로 일괄 삭제합니다."
+        },
+        {
+            id: 103, category: "intro", catLabel: "셀 전하 상태",
+            q: "NAND 플래시 셀의 트랩(Si3N4)에 전자가 비어 있는 소거(Erase) 상태일 때, 트랜지스터의 채널 전류와 디지털 판독 값은?",
+            options: [
+                "전류가 완전히 차단되어 '0'으로 읽힌다.",
+                "전자들의 방해가 없어 채널에 전류가 잘 통하므로 문턱 전압(Vth)이 낮고 디지털 '1'로 판독된다.",
+                "저항이 무한대가 되어 읽기 에러(Timeout)가 발생한다.",
+                "전압이 0V로 고정된다."
+            ],
+            ans: 1, tab: "intro", ref: "intro-trap",
+            exp: "소거 상태는 전자가 빠져나간 상태로, 전위 장벽이 낮아 전류가 쉽게 흘러 '1'로 판독됩니다. 전자를 채우면 전류가 막혀 '0'이 됩니다."
+        },
+        {
+            id: 104, category: "intro", catLabel: "직렬 스트링 도통",
+            q: "NAND 플래시의 64~128개 직렬 셀 스트링에서 특정 1개 페이지만 읽기 위해, 나머지 모든 비선택 셀들에 인가하는 높은 통과 전압(Pass Voltage)의 역할은?",
+            options: [
+                "비선택 셀들의 데이터를 모두 0으로 덮어쓴다.",
+                "비선택 셀들의 데이터 값에 상관없이 스위치를 강제로 닫아(도통) 전선처럼 전류를 통과시킨다.",
+                "비선택 셀들의 전자를 기판으로 방출시킨다.",
+                "DRAM 캐시로 데이터를 고속 복사한다."
+            ],
+            ans: 1, tab: "intro", ref: "intro-tree",
+            exp: "직렬 스트링에서 내가 원하는 1개 셀만 검사하기 위해, 나머지 비선택 셀들에는 높은 Vpass(6~7V)를 걸어 무조건 전선처럼 통과(도통)시킵니다."
+        },
+
+        // --- Category: phys (셀 물리 & 구조 105~108) ---
+        {
+            id: 105, category: "phys", catLabel: "셀 구조",
             q: "현대 3D BiCS NAND 플래시가 과거 2D의 Floating Gate(도체) 대신 Charge Trap Flash(CTF, 부도체 질화막)를 사용하는 가장 결정적인 물리적 이유는?",
             options: [
                 "CTF가 플로팅 게이트보다 제조 단가가 100배 저렴하기 때문에",
@@ -1361,21 +1597,14 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "CTF는 절연체인 Si3N4 질화막 내의 국소 트랩 자리에 전자를 가두므로 단일 결함으로 전하 전체가 방전되는 것을 막고, 셀 간 간섭이 극히 작아 3D 원통형 적층 홀 공정에 필수적입니다."
         },
         {
-            id: 102, category: "phys", catLabel: "터널링 물리",
+            id: 106, category: "phys", catLabel: "터널링 물리",
             q: "NAND 플래시의 쓰기(Program) 동작 시 전자가 얇은 산화막을 뚫고 트랩 층으로 유입되도록 만드는 물리적 현상은?",
             options: ["Hot Carrier Injection (HCI)", "Fowler-Nordheim (FN) 양자 터널링", "Magnetic Tunnel Junction (MTJ)", "Photoelectric Effect"],
             ans: 1, tab: "phys", ref: "phys-tunneling",
             exp: "NAND는 Control Gate에 +15~20V 고전압을 인가하여 산화막 양단에 형성된 강한 삼각 전위 장벽을 전자가 뚫고 지나가는 Fowler-Nordheim (FN) 터널링을 이용합니다."
         },
         {
-            id: 103, category: "phys", catLabel: "스트링 판독",
-            q: "NAND Cell String의 특정 워드라인(WL) 셀을 읽기 위해, 나머지 모든 비선택(Unselected) 워드라인에 인가하는 높은 도통 전압의 명칭은?",
-            options: ["Vpgm (Program Voltage)", "Vpass (Pass Voltage)", "Verase (Erase Voltage)", "Vcc"],
-            ans: 1, tab: "phys", ref: "phys-string",
-            exp: "비선택 셀들은 데이터 값(Vth)에 관계없이 무조건 저항이 낮은 켜짐(ON) 상태로 만들어 주어야 하므로 약 6~7V의 높은 Vpass 전압을 인가합니다."
-        },
-        {
-            id: 104, category: "phys", catLabel: "NAND vs NOR",
+            id: 107, category: "phys", catLabel: "NAND vs NOR",
             q: "NOR 플래시와 비교할 때 NAND 플래시가 대용량 스토리지(SSD)의 표준으로 독점하게 된 가장 큰 구조적 이유는?",
             options: [
                 "NAND는 직렬 스트링 구조로 셀 면적이 4F²에 불과하여 동일 면적당 집적도와 가격 경쟁력이 압도적이기 때문에",
@@ -1387,42 +1616,30 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "NAND는 셀들이 직렬로 연결되어 접촉 비아가 극소화되므로 셀 크기가 4F²로 작아 극단적인 고집적/저비용 대용량 스토리지를 구현할 수 있습니다."
         },
         {
-            id: 105, category: "phys", catLabel: "소거 상태",
-            q: "NAND 플래시 블록을 고전압(Verase ≈ 20V)으로 소거(Erase)했을 때 셀들의 문턱 전압(Vth) 상태는?",
-            options: [
-                "모든 셀의 Vth가 최고 양의 전압(+5V)으로 상승한다.",
-                "트랩 층의 전자가 방출되어 Vth가 음수(Negative, 약 -1V ~ -3V) 상태가 되며 데이터는 1(0xFF)로 인식된다.",
-                "셀이 물리적으로 단선되어 저항이 무한대가 된다.",
-                "셀 전압이 무작위로 0V로 수렴한다."
-            ],
-            ans: 1, tab: "phys", ref: "phys-tunneling",
-            exp: "소거 시 전자가 기판으로 방출되어 셀의 Vth는 음수(Erase State)가 되며, 디지털 로직상 '1'로 판독됩니다."
-        },
-        {
-            id: 106, category: "phys", catLabel: "Gate-All-Around",
+            id: 108, category: "phys", catLabel: "Gate-All-Around",
             q: "3D BiCS 낸드에서 원통형 채널 홀(Macaroni Channel)을 Control Gate가 360도 둘러싸는 트랜지스터 구조를 무엇이라 하는가?",
             options: ["Planar FET", "FinFET", "Gate-All-Around (GAA)", "Bipolar Junction"],
             ans: 2, tab: "phys", ref: "phys-ctf",
             exp: "3D CTF 낸드는 원통형 실리콘 채널 기둥 전체를 게이트가 감싸는 Gate-All-Around(GAA) 구조로 우수한 채널 정전 제어 능력을 발휘합니다."
         },
 
-        // --- Category: levels (셀 레벨 & ISPP 7~12) ---
+        // --- Category: levels (셀 레벨 & ISPP 109~114) ---
         {
-            id: 107, category: "levels", catLabel: "셀 레벨 구분",
+            id: 109, category: "levels", catLabel: "셀 레벨 구분",
             q: "TLC(Triple Level Cell)와 QLC(Quad Level Cell) 1개 셀이 구분해야 하는 문턱 전압(Vth) 상태의 수는 각각 몇 개인가?",
             options: ["TLC: 3개, QLC: 4개", "TLC: 6개, QLC: 8개", "TLC: 8개, QLC: 16개", "TLC: 16개, QLC: 32개"],
             ans: 2, tab: "levels", ref: "level-types",
             exp: "1개 셀의 비트 수를 N이라 할 때 상태 수는 2ⁿ개입니다. 따라서 TLC(3비트)는 2³=8개, QLC(4비트)는 2⁴=16개 상태를 구분합니다."
         },
         {
-            id: 108, category: "levels", catLabel: "ISPP 제어",
+            id: 110, category: "levels", catLabel: "ISPP 제어",
             q: "NAND 프로그래밍 시 목표 전압을 초과하지 않고 정밀하게 전압 분포 폭을 제어하기 위해 펄스 전압을 계단식으로 올려가며 검증하는 알고리즘은?",
             options: ["ISPP (Incremental Step Pulse Programming)", "Direct Charge Pumping", "Constant Current Stress", "One-Shot High Voltage Write"],
             ans: 0, tab: "levels", ref: "level-ispp",
             exp: "ISPP는 작은 스텝 전압(ΔVispp)씩 증가시키며 매 펄스마다 Program Verify(PV)를 수행하는 낸드의 표준 프로그래밍 제어 방식입니다."
         },
         {
-            id: 109, category: "levels", catLabel: "ΔVispp 트레이드오프",
+            id: 111, category: "levels", catLabel: "ΔVispp 트레이드오프",
             q: "ISPP 알고리즘에서 스텝 전압 폭(ΔVispp)을 더 잘게 줄일 때 발생하는 결과로 옳은 것은?",
             options: [
                 "문턱 전압(Vth) 분포 폭이 좁아져 신뢰성이 높아지지만, 프로그래밍 시간(tPROG)이 길어진다.",
@@ -1434,7 +1651,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "ΔVispp를 좁히면 정밀한 주입이 가능해져 Vth 피크가 예리해지지만(신뢰성 증가), 반복해야 하는 펄스 루프 수가 증가하여 tPROG가 길어집니다."
         },
         {
-            id: 110, category: "levels", catLabel: "Gray Code 배치",
+            id: 112, category: "levels", catLabel: "Gray Code 배치",
             q: "NAND Vth 상태 간에 인접한 상태끼리 오직 1개 비트만 차이나도록 코드를 배치(Gray Code)하는 주된 목적은?",
             options: [
                 "데이터 압축률을 2배로 높이기 위해",
@@ -1446,7 +1663,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "인접 상태 간에 1비트만 차이나도록 Gray Code를 매핑하면, 노이즈나 Retention으로 인접 상태와 겹쳐도 최대 1비트 에러에 그쳐 LDPC 복구 효율이 극대화됩니다."
         },
         {
-            id: 111, category: "levels", catLabel: "논리 페이지 매핑",
+            id: 113, category: "levels", catLabel: "논리 페이지 매핑",
             q: "하나의 TLC 셀에 저장되는 3개 비트가 FTL 및 파일시스템 관점에서 서로 다른 Lower Page, Middle Page, Upper Page로 분산 매핑되는 이유는?",
             options: [
                 "낸드 핀 수가 부족하기 때문에",
@@ -1458,16 +1675,16 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "한 셀의 비트들을 서로 다른 논리 페이지에 매핑하여 호스트가 4KB/16KB 단위로 독립적인 페이지 읽기/쓰기를 수행할 수 있도록 지원합니다."
         },
         {
-            id: 112, category: "levels", catLabel: "Foggy-Fine Program",
+            id: 114, category: "levels", catLabel: "Foggy-Fine Program",
             q: "TLC/QLC에서 인접 셀 간의 기생 커패시턴스 간섭을 최소화하기 위해 전압을 2단계로 나누어 프로그래밍하는 기법은?",
             options: ["Foggy-Fine (Multi-Pass) Program", "Single-Shot Turbo Program", "Reverse Erase Program", "Bitline Sweep Program"],
             ans: 0, tab: "levels", ref: "level-gray",
             exp: "먼저 거친 전압으로 1차 기록(Foggy)한 후, 인접 WL 기록이 끝난 뒤 정밀 전압(Fine)으로 최종 마무리하는 2단계 기법을 Foggy-Fine Program이라고 합니다."
         },
 
-        // --- Category: bics (3D BiCS 다이 구조 13~17) ---
+        // --- Category: bics (3D BiCS 다이 구조 115~118) ---
         {
-            id: 113, category: "bics", catLabel: "CuA / PUC 기술",
+            id: 115, category: "bics", catLabel: "CuA / PUC 기술",
             q: "3D NAND 다이에서 Row/Col 디코더, 펌프, 페이지 버퍼 등 주변 회로(Peri)를 셀 어레이 하단 기판에 배치하는 CuA(Circuit Under Array) / PUC 기술의 핵심 이점은?",
             options: [
                 "칩 다이 면적(Die Size)을 약 20~30% 축소하여 웨이퍼당 생산 넷 다이를 극대화한다.",
@@ -1479,14 +1696,14 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "CuA/PUC는 면적을 많이 차지하는 주변 회로를 셀 밑으로 깔아버려 칩 면적 효율과 웨이퍼당 생산 칩 수를 극대화하는 핵심 공정입니다."
         },
         {
-            id: 114, category: "bics", catLabel: "Multi-Tier Stacking",
+            id: 116, category: "bics", catLabel: "Multi-Tier Stacking",
             q: "3D BiCS 낸드가 112단, 162단, 218단 등 초고적층으로 발전하면서 단일 홀 에칭 한계를 극복하기 위해 도입한 공정은?",
             options: ["Planar Shrinkage", "Multi-Tier (2-Deck) Stacking & Bonding", "Liquid Cooling Etching", "Magnetic Alignment"],
             ans: 1, tab: "bics", ref: "bics-tiers",
             exp: "수직 홀 깊이가 너무 깊어지면 상단과 하단의 직경 차이(에칭 한계)가 발생하므로, 2개 이상의 독립 스택을 따로 에칭한 뒤 결합하는 Multi-Tier 접합 기술을 사용합니다."
         },
         {
-            id: 115, category: "bics", catLabel: "Multi-Plane 병렬화",
+            id: 117, category: "bics", catLabel: "Multi-Plane 병렬화",
             q: "단일 낸드 다이 내부에서 2개 또는 4개의 독립 플레인(Dual/Quad Plane)을 동시에 읽거나 프로그래밍할 때 지켜야 하는 일반적인 제약 조건은?",
             options: [
                 "각 플레인의 블록 번호가 완전히 달라야 한다.",
@@ -1498,35 +1715,23 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "Multi-Plane 동시 동작 커맨드는 내부 Row 디코더를 공유하므로 각 플레인에서 동일한 페이지 주소(Row Offset)에 대해 수행되어야 하는 규칙이 있습니다."
         },
         {
-            id: 116, category: "bics", catLabel: "CBA 하이브리드 본딩",
-            q: "CMOS 주변 회로 웨이퍼와 3D 셀 어레이 웨이퍼를 각각 별도로 제작한 뒤, 웨이퍼 상태에서 Cu-to-Cu 하이브리드 본딩으로 맞붙이는 최신 기술은?",
+            id: 118, category: "bics", catLabel: "CBA 하이브리드 본딩",
+            q: "CMOS 주변 회로 웨이퍼와 3D 셀 어레이 웨이퍼를 각각 별도로 제작한 뒤, 웨이퍼 상태에서 Cu-to-Cu 하이브리드 본딩으로 맞붙이는 BiCS8 최신 기술은?",
             options: ["CBA (CMOS Directly Bonded to Array)", "Wire Bonding Packaging", "Through-Silicon Via (TSV)", "Solder Bump Flip-chip"],
             ans: 0, tab: "bics", ref: "bics-cua",
             exp: "Kioxia/SanDisk BiCS8 등에 적용되는 CBA 기술은 주변 회로와 셀 어레이를 각기 최적 공정으로 제작한 뒤 다이렉트 본딩하여 속도와 밀도를 동시 달성합니다."
         },
-        {
-            id: 117, category: "bics", catLabel: "2D 낸드의 종말",
-            q: "과거 2D 평면 플래시가 15nm 이하에서 단종되고 3D BiCS로 전환된 물리적 원인이 아닌 것은?",
-            options: [
-                "인접 셀 간 기생 정전용량 결합(Crosstalk) 폭증",
-                "셀당 포획되는 전자의 수가 수십 개에 불과하여 노이즈에 극도로 취약해짐",
-                "초미세 선폭 패터닝을 위한 포토리소그래피 한계 및 누설 전류 급증",
-                "낸드 인터페이스 규격이 PCI Express로 변경되었기 때문에"
-            ],
-            ans: 3, tab: "bics", ref: "bics-evo",
-            exp: "PCIe는 호스트-컨트롤러 인터페이스 표준일 뿐, 2D 평면 낸드의 물리적 스케일링 한계(Crosstalk, 극소 전자 수, 누설 전류)와는 무관합니다."
-        },
 
-        // --- Category: bus (버스 인터페이스 & 타이밍 18~23) ---
+        // --- Category: bus (버스 인터페이스 & 타이밍 119~123) ---
         {
-            id: 118, category: "bus", catLabel: "플래시 제어 핀",
+            id: 119, category: "bus", catLabel: "플래시 제어 핀",
             q: "NAND 컨트롤러가 명령(Command) 바이트를 낸드 다이에 전달할 때 반드시 HIGH 상태로 올려야 하는 제어 핀은?",
             options: ["ALE (Address Latch Enable)", "CLE (Command Latch Enable)", "CE# (Chip Enable)", "RE# (Read Enable)"],
             ans: 1, tab: "bus", ref: "bus-pins",
             exp: "CLE(Command Latch Enable) 신호가 High일 때 DQ 버스에 실린 바이트가 낸드 내부 커맨드 레지스터에 래치됩니다."
         },
         {
-            id: 119, category: "bus", catLabel: "Page Read 시퀀스",
+            id: 120, category: "bus", catLabel: "Page Read 시퀀스",
             q: "일반적인 비동기/DDR 낸드에서 1개 페이지를 읽기 위해 발행하는 표준 커맨드 시퀀스는?",
             options: [
                 "00h - 5 Cycle Address - 30h",
@@ -1538,14 +1743,14 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "Page Read는 00h 커맨드 ➔ 5사이클 주소 입력 ➔ 30h 확인 커맨드 순서로 발행되며, 이후 R/B#가 Low(Busy)로 떨어져 tR 동안 감지합니다."
         },
         {
-            id: 120, category: "bus", catLabel: "Ready/Busy 신호",
+            id: 121, category: "bus", catLabel: "Ready/Busy 신호",
             q: "NAND 다이가 내부적으로 셀 감지(tR)나 블록 소거(tBERS)를 수행 중임을 호스트 컨트롤러에 알리는 오픈 드레인 핀은?",
             options: ["R/B# (Ready/Busy#)", "WP# (Write Protect)", "DQS", "CLE"],
             ans: 0, tab: "bus", ref: "bus-pins",
             exp: "R/B# 핀은 내부 연산 중일 때 Low(Busy)를 유지하고, 작업이 완료되면 High(Ready)로 복귀하여 인터럽트 또는 폴링 신호를 제공합니다."
         },
         {
-            id: 121, category: "bus", catLabel: "타이밍 파라미터",
+            id: 122, category: "bus", catLabel: "타이밍 파라미터",
             q: "NAND 타이밍 파라미터 중 소요 시간이 긴 순서대로 올바르게 나열한 것은? (단, TLC 기준)",
             options: [
                 "tBERS (지우기) > tPROG (쓰기) > tR (읽기)",
@@ -1557,21 +1762,14 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
             exp: "TLC 기준 소거 시간(tBERS)은 약 5~10ms, 쓰기 시간(tPROG)은 약 1ms, 읽기 시간(tR)은 약 50~80μs로 소거가 읽기보다 수백 배 느립니다."
         },
         {
-            id: 122, category: "bus", catLabel: "DQS 스트로브",
+            id: 123, category: "bus", catLabel: "DQS 스트로브",
             q: "Toggle DDR 및 고속 ONFI 낸드에서 초당 수천 메가트랜스퍼(MT/s)의 고주파 데이터 전송 시 지터(Jitter)를 억제하기 위해 사용하는 데이터 동기화 신호는?",
             options: ["DQS (Data Strobe)", "ALE", "WP#", "Vref"],
             ans: 0, tab: "bus", ref: "bus-protocols",
             exp: "DQS(Data Strobe)는 고속 DDR 버스에서 데이터 신호(DQ)와 정확히 위상을 맞추어 클럭 에지 타이밍을 동기화하는 차동/단일 스트로브 신호입니다."
         },
-        {
-            id: 123, category: "bus", catLabel: "Cache Program",
-            q: "이전 페이지가 낸드 물리 셀에 ISPP로 기록되는 동안, 다음 페이지 데이터를 페이지 버퍼 캐시 래치에 미리 로드할 수 있게 해주는 기능은?",
-            options: ["Cache Program (15h)", "Multi-Die Interleave", "Read Retry", "Soft Bit Read"],
-            ans: 0, tab: "bus", ref: "bus-cmds",
-            exp: "Cache Program은 10h 대신 15h 커맨드를 사용하여 낸드 내부 듀얼 래치를 활용해 버스 전송과 셀 쓰기 동작을 오버랩시킵니다."
-        },
 
-        // --- Category: noise (물리 결함 & 노이즈 24~28) ---
+        // --- Category: noise (물리 결함 & 노이즈 124~128) ---
         {
             id: 124, category: "noise", catLabel: "Read Disturb",
             q: "특정 워드라인을 읽을 때 비선택 셀들에 인가되는 고전압(Vpass ≈ 6~7V)으로 인해 비선택 셀들의 Vth가 우측으로 이동하는 결함은?",
@@ -1614,7 +1812,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
                 "온도 센서의 온도를 100도까지 올려본다.",
                 "호스트 파일시스템 포맷을 수행한다."
             ],
-            ans: 1, tab: "char", ref: "char-fbbm",
+            ans: 1, tab: "bridge", ref: "bridge-fbbm",
             exp: "공장 배드 블록은 스페어 영역 특정 바이트(예: 1st Byte)에 제조사 검사 플래그(00h 등)가 마킹되어 있으므로, 초기 부팅 시 이를 스캔하여 BBT를 구축합니다 (절대 지우면 안 됨)."
         }
     ];
@@ -1991,4 +2189,3 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
 
 </body>
 </html>
-
