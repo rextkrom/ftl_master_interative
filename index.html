@@ -121,6 +121,10 @@
             margin: 2.5rem auto;
             padding: 0 1.25rem;
             flex: 1;
+            /* body가 flex column이므로 margin:auto + max-width만 있으면
+               main이 콘텐츠 최대 폭(최대 1200px)으로 늘어나 모바일에서 화면 밖으로 넘침 */
+            width: 100%;
+            min-width: 0;
         }
 
         .hero-banner {
@@ -240,10 +244,9 @@
         }
 
         .feature-list li {
-            padding: 0.4rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            /* flex를 쓰면 텍스트 노드/strong이 각각 별도 칼럼이 되어 좁은 화면에서 라벨이 찌그러짐 → 일반 블록 + 내어쓰기 */
+            padding: 0.4rem 0 0.4rem 1.6em;
+            text-indent: -1.6em;
             border-bottom: 1px dashed var(--border);
         }
         .feature-list li:last-child { border-bottom: none; }
@@ -383,7 +386,7 @@
             th, td { padding: 0.55rem 0.65rem; }
             .formula { display: block; white-space: normal; font-size: 0.82rem; }
             .grid-2 { gap: 0.9rem; }
-            .hero-title { font-size: 1.6rem; }
+            .hero-title { font-size: 1.6rem; word-break: keep-all; }
             .hero-desc { font-size: 0.95rem; }
             .portal-grid { gap: 1rem; }
             .card-heading { font-size: 1.25rem; }
@@ -438,7 +441,7 @@
                     <li>✔️ <strong>셀 물리:</strong> Floating Gate vs Charge Trap Flash (CTF)</li>
                     <li>✔️ <strong>전압 제어:</strong> ISPP 계단식 펄스 및 Gray Code 매핑</li>
                     <li>✔️ <strong>3D 적층:</strong> BiCS 다이 구조 & CuA/PUC/CBA 웨이퍼 본딩</li>
-                    <li>✔️ <strong>인터페이스:</strong> Toggle 5.0 / ONFI 5.1 커맨드 시퀀스 ($t_R, t_{PROG}$)</li>
+                    <li>✔️ <strong>인터페이스:</strong> Toggle 5.0 / ONFI 5.1 커맨드 시퀀스 (tR, tPROG)</li>
                     <li>✔️ <strong>신뢰성:</strong> Data Retention, Read Disturb, Self-Boosting</li>
                     <li>🎮 <strong>시뮬레이터:</strong> Vth 노이즈 마진 & 디지털 버스 파형 시뮬레이터</li>
                     <li>🎯 <strong>실전 모의고사:</strong> 총 28문항 스마트 오답 가중치 테스트</li>

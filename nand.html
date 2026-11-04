@@ -753,11 +753,11 @@ Silicon Channel         ──── [ Poly-Si (전류가 흐르는 마카로니
                 <p>NAND 플래시는 셀을 프로그램(쓰기)하고 소거(지우기)할 때 <strong>Fowler-Nordheim (FN) 양자 터널링</strong> 방식을 사용합니다.</p>
                 <div class="callout callout-info">
                     <div class="callout-title">프로그램(Program) 동작 원리</div>
-                    <p>Control Gate에 높은 양전압(<strong>Vpgm ≈ +15V ~ +20V</strong>)을 인가하고 채널을 0V(접지)로 유지하면, 강한 수직 전기장이 형성되어 채널의 전자가 얇은 터널 산화막의 삼각 전위 장벽을 뚫고 <strong>트랩 층(Si3N4)으로 주입</strong>됩니다. 결과적으로 문턱 전압($V_{th}$)이 양(+)의 방향으로 상승합니다.</p>
+                    <p>Control Gate에 높은 양전압(<strong>Vpgm ≈ +15V ~ +20V</strong>)을 인가하고 채널을 0V(접지)로 유지하면, 강한 수직 전기장이 형성되어 채널의 전자가 얇은 터널 산화막의 삼각 전위 장벽을 뚫고 <strong>트랩 층(Si3N4)으로 주입</strong>됩니다. 결과적으로 문턱 전압(V<sub>th</sub>)이 양(+)의 방향으로 상승합니다.</p>
                 </div>
                 <div class="callout callout-warn">
                     <div class="callout-title">소거(Erase) 동작 원리</div>
-                    <p>기판(P-Well)에 고전압(<strong>Verase ≈ +20V</strong>)을 걸고 Control Gate를 0V로 접지합니다. 트랩 층에 갇혀 있던 전자들이 기판으로 일제히 빠져나가며, 셀의 $V_{th}$는 <strong>음수(Negative, 보통 -1V ~ -3V)</strong>의 소거 상태(Erase State)로 복원됩니다.</p>
+                    <p>기판(P-Well)에 고전압(<strong>Verase ≈ +20V</strong>)을 걸고 Control Gate를 0V로 접지합니다. 트랩 층에 갇혀 있던 전자들이 기판으로 일제히 빠져나가며, 셀의 V<sub>th</sub>는 <strong>음수(Negative, 보통 -1V ~ -3V)</strong>의 소거 상태(Erase State)로 복원됩니다.</p>
                 </div>
             </div>
 
@@ -868,7 +868,7 @@ Program Voltage (Vpgm)
     Pulse1   Pulse2 (+ΔVispp) Pulse3 (+ΔVispp)
                 </div>
                 <ul>
-                    <li><strong>스텝 전압 ($\Delta V_{ISPP}$):</strong> 펄스마다 전압을 약 0.2V~0.4V씩 계단식으로 상승 인가.</li>
+                    <li><strong>스텝 전압 (ΔV<sub>ISPP</sub>):</strong> 펄스마다 전압을 약 0.2V~0.4V씩 계단식으로 상승 인가.</li>
                     <li><strong>Program Verify (PV):</strong> 펄스 직후 목표 전압에 도달했는지 확인. 도달한 비트는 비트라인을 Vcc로 올려 추가 프로그래밍을 차단(Inhibit).</li>
                     <li><strong>카메라 렌즈 조절 비유:</strong> 마치 <strong>오토포커스(AF) 렌즈</strong>를 맞출 때 스텝 모터를 한 번에 돌리지 않고 펄스를 톡톡 주며 콘트라스트 피크를 찾는 피드백 제어와 완벽히 동일합니다.</li>
                 </ul>
@@ -1059,15 +1059,15 @@ Program Voltage (Vpgm)
             <div class="card-header">
                 <div>
                     <span class="card-badge badge-bus">Timing Parameters</span>
-                    <h2 class="card-title" style="margin-top:0.3rem;">4. 핵심 타이밍 파라미터 ($t_R$, $t_{PROG}$, $t_{BERS}$)</h2>
+                    <h2 class="card-title" style="margin-top:0.3rem;">4. 핵심 타이밍 파라미터 (t<sub>R</sub>, t<sub>PROG</sub>, t<sub>BERS</sub>)</h2>
                 </div>
             </div>
             <div class="table-responsive">
                 <table>
                     <tr><th>파라미터</th><th>의미</th><th>SLC</th><th>TLC</th><th>QLC</th><th>펌웨어 설계 고려사항</th></tr>
-                    <tr><td><strong>$t_R$ (Read Time)</strong></td><td>셀에서 Page Buffer로 감지 로드하는 시간</td><td>약 20 ~ 25 μs</td><td>약 45 ~ 80 μs</td><td>약 100 ~ 150 μs</td><td>호스트 랜덤 읽기 IOPS 및 QD=1 지연시간 직결</td></tr>
-                    <tr><td><strong>$t_{PROG}$ (Program Time)</strong></td><td>Page Buffer에서 셀로 ISPP 쓰기 시간</td><td>약 200 ~ 300 μs</td><td>약 800 ~ 1,500 μs</td><td>약 2,000 ~ 4,000 μs</td><td>쓰기 버퍼 고갈 시 성능 절벽의 원인</td></tr>
-                    <tr><td><strong>$t_{BERS}$ (Block Erase)</strong></td><td>블록 전체를 고전압으로 소거하는 시간</td><td>약 2 ~ 3 ms</td><td>약 4 ~ 10 ms</td><td>약 10 ~ 15 ms</td><td><strong>Read 블록킹 유발 ➔ Erase Suspend 필수</strong></td></tr>
+                    <tr><td><strong>t<sub>R</sub> (Read Time)</strong></td><td>셀에서 Page Buffer로 감지 로드하는 시간</td><td>약 20 ~ 25 μs</td><td>약 45 ~ 80 μs</td><td>약 100 ~ 150 μs</td><td>호스트 랜덤 읽기 IOPS 및 QD=1 지연시간 직결</td></tr>
+                    <tr><td><strong>t<sub>PROG</sub> (Program Time)</strong></td><td>Page Buffer에서 셀로 ISPP 쓰기 시간</td><td>약 200 ~ 300 μs</td><td>약 800 ~ 1,500 μs</td><td>약 2,000 ~ 4,000 μs</td><td>쓰기 버퍼 고갈 시 성능 절벽의 원인</td></tr>
+                    <tr><td><strong>t<sub>BERS</sub> (Block Erase)</strong></td><td>블록 전체를 고전압으로 소거하는 시간</td><td>약 2 ~ 3 ms</td><td>약 4 ~ 10 ms</td><td>약 10 ~ 15 ms</td><td><strong>Read 블록킹 유발 ➔ Erase Suspend 필수</strong></td></tr>
                 </table>
             </div>
         </div>
@@ -1094,7 +1094,7 @@ Program Voltage (Vpgm)
                 <p>전하 트랩 층에 갇힌 전자가 시간이 흐름에 따라 열 에너지에 의해 절연 산화막을 뚫고 기판으로 자연 방전되는 현상입니다. 결과적으로 문턱 전압(Vth)이 <strong>낮은 쪽(좌측)</strong>으로 이동합니다.</p>
                 <div class="callout callout-info">
                     <div class="callout-title">온도와 아레니우스(Arrhenius) 가속 수명 방정식</div>
-                    <p>보관 온도가 10°C 상승할 때마다 Retention 수명은 약 2배씩 급감합니다. JEDEC 표준은 활성화 에너지($E_a \approx 1.1\text{eV}$) 기반으로 고온 챔버 가속 시험(HTOL / Aging)을 통해 드라이브의 전원 차단 상태 1년/3년 데이터 보존을 검증합니다.</p>
+                    <p>보관 온도가 10°C 상승할 때마다 Retention 수명은 약 2배씩 급감합니다. JEDEC 표준은 활성화 에너지(E<sub>a</sub> ≈ 1.1 eV) 기반으로 고온 챔버 가속 시험(HTOL / Aging)을 통해 드라이브의 전원 차단 상태 1년/3년 데이터 보존을 검증합니다.</p>
                 </div>
             </div>
 
@@ -1236,7 +1236,7 @@ Program Voltage (Vpgm)
             <div class="grid-2">
                 <div>
                     <h3 class="sub-header">🔍 Valley Search 원리</h3>
-                    <p>인접한 두 문턱 전압(Vth) 분포가 겹치는 영역의 비트 반전 빈도를 실시간 카운트하여, 미분 기울기($\frac{d(\text{Error})}{dV} = 0$)가 0이 되는 극솟값(Valley)을 이분 탐색(Binary Search)이나 Proximity Search로 수 스텝 내에 고속 수렴시킵니다. (마치 <strong>영상 처리에서 Otsu 이진화 임계값을 찾는 히스토그램 계곡 탐색</strong>과 수학적으로 완벽히 동일합니다!)</p>
+                    <p>인접한 두 문턱 전압(Vth) 분포가 겹치는 영역의 비트 반전 빈도를 실시간 카운트하여, 미분 기울기(d(Error)/dV = 0)가 0이 되는 극솟값(Valley)을 이분 탐색(Binary Search)이나 Proximity Search로 수 스텝 내에 고속 수렴시킵니다. (마치 <strong>영상 처리에서 Otsu 이진화 임계값을 찾는 히스토그램 계곡 탐색</strong>과 수학적으로 완벽히 동일합니다!)</p>
                 </div>
                 <div>
                     <h3 class="sub-header">🧠 Predictive Local Offset Caching</h3>
@@ -1297,7 +1297,7 @@ Program Voltage (Vpgm)
 
             <div class="callout callout-interview">
                 <div class="callout-title">Q3. "BiCS8 218단에 적용된 CBA(CMOS Directly Bonded to Array) 기술이 컨트롤러 펌웨어 설계에 주는 영향은?"</div>
-                <p><strong>[모범 답변]:</strong> "CBA는 로직 웨이퍼와 셀 웨이퍼가 분리 제조되어 I/O 속도가 최대 3.2~4.8 Gbps로 비약적으로 향상되었습니다. 펌웨어 관점에서는 낸드 버스 전송 시간(tBus)이 극적으로 줄어들어 $t_{PROG}$ 및 $t_R$과의 비대칭성이 더욱 심화됩니다. 따라서 FMC의 커맨드 디스크립터 큐잉과 Dual-Plane/Quad-Plane 인터리빙을 더욱 공격적으로 스케줄링하고, Cache Program/Read 오버랩을 극대화하여 버스 유휴 시간을 없애는 파이프라인 설계가 필수적입니다."</p>
+                <p><strong>[모범 답변]:</strong> "CBA는 로직 웨이퍼와 셀 웨이퍼가 분리 제조되어 I/O 속도가 최대 3.2~4.8 Gbps로 비약적으로 향상되었습니다. 펌웨어 관점에서는 낸드 버스 전송 시간(tBus)이 극적으로 줄어들어 t<sub>PROG</sub> 및 t<sub>R</sub>과의 비대칭성이 더욱 심화됩니다. 따라서 FMC의 커맨드 디스크립터 큐잉과 Dual-Plane/Quad-Plane 인터리빙을 더욱 공격적으로 스케줄링하고, Cache Program/Read 오버랩을 극대화하여 버스 유휴 시간을 없애는 파이프라인 설계가 필수적입니다."</p>
             </div>
 
             <div class="callout callout-interview">
@@ -1363,7 +1363,7 @@ print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV,
 
         <!-- Simulator 1: Vth Distribution Visualizer -->
         <div class="card grid-full" id="sim-vth-box">
-            <h3 style="margin-bottom:0.5rem;">① SLC ~ QLC 문턱 전압($V_{th}$) 분포 & 노이즈 마진 시뮬레이터</h3>
+            <h3 style="margin-bottom:0.5rem;">① SLC ~ QLC 문턱 전압(V<sub>th</sub>) 분포 & 노이즈 마진 시뮬레이터</h3>
             <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
                 SLC에서 QLC로 갈수록 좁은 전압 창 안에 피크 수가 급증하여 마진이 어떻게 좁아지는지 확인하세요. P/E Cycle 노화 슬라이더를 올리면 산화막 마모로 인해 분포 곡선이 넓어져 상태 간 중첩(Bit Error)이 발생하는 현상을 직접 체험할 수 있습니다.
             </p>
