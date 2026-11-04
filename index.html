@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>NAND Flash & FTL 마스터 포털: Senior Staff Firmware Engineer 편</title>
     <style>
         :root {
@@ -345,6 +345,58 @@
             color: var(--text-muted);
             font-size: 0.85rem;
             margin-top: auto;
+        }
+    
+        /* ===== Mobile Responsive (iPhone etc.) ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { overflow-x: hidden; }
+        img, canvas, table, pre { max-width: 100%; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+        .portal-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); }
+        .roadmap-steps { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+        .card, .portal-card, .sim-container, .quiz-question-box, .info-card { min-width: 0; }
+        .card *, .portal-card * { overflow-wrap: anywhere; word-break: keep-all; }
+        .diagram-box, .diagram-box * { overflow-wrap: normal; word-break: normal; }
+        .table-responsive table { min-width: 560px; }
+        .table-responsive td, .table-responsive th { word-break: keep-all; overflow-wrap: break-word; }
+        canvas { height: auto; }
+
+        @media (max-width: 768px) {
+            .header-top { flex-wrap: wrap; padding: 0.6rem 0.9rem; gap: 0.5rem; padding-top: max(0.6rem, env(safe-area-inset-top)); }
+            .brand-title { font-size: 1.05rem; flex-wrap: wrap; gap: 0.4rem; }
+            .header-controls { width: 100%; gap: 0.4rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+            .header-controls::-webkit-scrollbar { display: none; }
+            .btn-theme { font-size: 0.78rem; padding: 0.4rem 0.6rem; white-space: nowrap; flex-shrink: 0; }
+            nav.tabs-nav { padding: 0 0.6rem; }
+            button.tab-btn { font-size: 0.82rem; padding: 0.65rem 0.6rem; }
+            main { margin: 1rem auto 2rem auto; padding: 0 0.75rem; padding-left: max(0.75rem, env(safe-area-inset-left)); padding-right: max(0.75rem, env(safe-area-inset-right)); }
+            .card, .portal-card, .sim-container, .info-card { padding: 1rem; border-radius: 10px; }
+            .quiz-question-box { padding: 1.1rem; }
+            .card-title { font-size: 1.05rem; }
+            .card-header { flex-direction: column; gap: 0.4rem; }
+            h2.section-header { font-size: 1.2rem; }
+            p, li { font-size: 0.93rem; }
+            ul, ol { margin-left: 1.1rem; }
+            .callout { padding: 0.8rem 0.9rem; font-size: 0.88rem; }
+            .diagram-box { font-size: 0.72rem; line-height: 1.4; padding: 0.8rem; margin-left: -0.25rem; margin-right: -0.25rem; }
+            table { font-size: 0.8rem; }
+            th, td { padding: 0.55rem 0.65rem; }
+            .formula { display: block; white-space: normal; font-size: 0.82rem; }
+            .grid-2 { gap: 0.9rem; }
+            .hero-title { font-size: 1.6rem; }
+            .hero-desc { font-size: 0.95rem; }
+            .portal-grid { gap: 1rem; }
+            .card-heading { font-size: 1.25rem; }
+            .quiz-header-bar { flex-direction: column; align-items: stretch; }
+            .quiz-header-bar > div { text-align: left !important; }
+            .quiz-question-title { font-size: 1.02rem; }
+            .quiz-option { padding: 0.75rem 0.85rem; font-size: 0.9rem; }
+            .sim-controls { gap: 0.5rem; }
+            .sim-controls > * { flex: 1 1 auto; }
+            .btn-action { padding: 0.6rem 0.9rem; font-size: 0.85rem; justify-content: center; }
+            .nand-block-grid { grid-template-columns: 1fr; }
+            .vth-chart { height: 150px; }
+            footer { padding: 1.25rem 0.9rem; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
         }
     </style>
 </head>
