@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTL (Flash Translation Layer) 마스터</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --surface: #ffffff; --text: #1e293b; --border: #e2e8f0; --danger: #ef4444; --success: #22c55e; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); line-height: 1.6; }
+        header { background-color: var(--primary); color: white; padding: 1rem; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        nav { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
+        button.tab-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button.tab-btn.active, button.tab-btn:hover { background: white; color: var(--primary); }
+        main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .section { background: var(--surface); padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; display: none; }
+        .section.active { display: block; }
+        h2 { border-left: 4px solid var(--primary); padding-left: 0.5rem; margin-top: 0; }
+        .diagram { background: #f1f5f9; border: 1px solid var(--border); padding: 1rem; border-radius: 4px; font-family: monospace; text-align: center; margin: 1rem 0; overflow-x: auto; white-space: pre; line-height: 1.2; }
+        .card { border: 1px solid var(--border); border-radius: 4px; padding: 1rem; margin-bottom: 1rem; }
+        .quiz-question { font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; }
+        .options { display: flex; flex-direction: column; gap: 0.5rem; }
+        .option { padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); cursor: pointer; transition: 0.2s; text-align: left; font-size: 1rem; }
+        .option:hover { background: #f1f5f9; }
+        .option.correct { background: #dcfce7; border-color: var(--success); }
+        .option.wrong { background: #fee2e2; border-color: var(--danger); }
+        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 4px; display: none; font-weight: bold; }
+        .feedback.show { display: block; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 1rem; display: none; }
+        .score-board { text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; }
+        mark { background-color: #fef08a; padding: 0 0.2rem; border-radius: 2px; }
+        .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem; font-weight: bold; background: var(--primary); color: white; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 style="margin:0; font-size: 1.5rem;">FTL 짬짬이 마스터</h1>
+    <nav>
+        <button class="tab-btn active" onclick="switchTab('study')">📖 핵심 개념 학습</button>
+        <button class="tab-btn" onclick="switchTab('quiz')">🎯 실전 모의고사</button>
+    </nav>
+</header>
+
+<main>
+    <!-- 학습 탭 -->
+    <div id="study" class="section active">
+        
+        <div class="card" id="ftl-intro">
+            <h2>1. FTL이란 무엇인가?</h2>
+            <p>NAND 플래시 메모리는 HDD나 RAM과 달리 <strong>'덮어쓰기(Overwrite)'가 불가능</strong>합니다. 무조건 지우고(Erase) 다시 써야 합니다. 게다가 읽기/쓰기는 페이지(Page) 단위로, 지우기는 블록(Block) 단위로 이루어집니다.</p>
+            <p>이러한 하드웨어적 한계를 소프트웨어적으로 가려주어, 호스트(PC)가 마치 일반 하드디스크처럼 편하게 쓸 수 있게 해주는 <strong>펌웨어 계층</strong>이 바로 <strong>FTL(Flash Translation Layer)</strong>입니다.</p>
+<div class="diagram">
+[ Host (OS / File System) ]
+          ⬇ (논리적 주소 LBA)
+==================================
+        [ FTL (펌웨어) ]
+   1. Mapping  2. GC  3. Wear Leveling
+==================================
+          ⬇ (물리적 주소 PBA)
+[ NAND Flash Memory (물리적 하드웨어) ]
+</div>
+        </div>
+
+        <div class="card" id="ftl-mapping">
+            <h2>2. 맵핑 (Address Mapping)</h2>
+            <span class="badge">핵심 기능 1</span>
+            <p>호스트가 요구하는 <strong>논리 주소(LBA)</strong>를 NAND 메모리의 실제 <strong>물리 주소(PBA)</strong>로 변환하는 테이블을 관리합니다.</p>
+            <p>덮어쓰기가 안 되기 때문에, 데이터가 수정되면 <strong>기존 데이터를 무효화(Invalid)</strong> 처리하고 <strong>새로운 빈 공간에 데이터를 쓰고(Valid)</strong> 맵핑 테이블을 갱신합니다.</p>
+<div class="diagram">
+호스트: "LBA 1번(문서.txt) 수정해줘!"
+
+[맵핑 테이블]
+LBA 1 ---> (과거) Block 10, Page 0 (Invalid ❌)
+      ---> (현재) Block 12, Page 2 (Valid ✅)
+</div>
+        </div>
+
+        <div class="card" id="ftl-gc">
+            <h2>3. 가비지 컬렉션 (Garbage Collection, GC)</h2>
+            <span class="badge">핵심 기능 2</span>
+            <p>데이터가 수정될 때마다 ❌ 무효화(Invalid)된 찌꺼기 데이터가 쌓입니다. 빈 공간이 부족해지면, 여러 블록에 흩어진 ✅ 유효(Valid) 데이터만 모아서 <strong>새로운 블록으로 이사(Copy)시키고, 기존 블록들을 통째로 지워서(Erase) 빈 블록(Free Block)을 확보</strong>하는 작업입니다.</p>
+            <p><mark>면접 포인트:</mark> GC가 발생하면 NAND에 읽기/쓰기 작업이 폭증하여 시스템 응답 속도(Latency)가 급격히 떨어집니다. 이를 최적화하는 것이 FTL 스케줄링의 핵심입니다.</p>
+<div class="diagram">
+[Block A] : ❌ ❌ ✅ ❌
+[Block B] : ❌ ✅ ❌ ❌
+      ⬇ (GC 발동: 유효 데이터만 복사)
+[Block C] : ✅ ✅ 빈 빈 빈... (새로운 Free Block에 이사)
+      ⬇ (기존 블록 지우기)
+[Block A], [Block B] ➡ 완전 초기화 (Free Block으로 재탄생)
+</div>
+        </div>
+
+        <div class="card" id="ftl-wl">
+            <h2>4. 웨어 레벨링 (Wear Leveling)</h2>
+            <span class="badge">핵심 기능 3</span>
+            <p>NAND 플래시의 각 블록은 지우기(Erase) 가능 횟수에 수명이 정해져 있습니다. 특정 블록만 자주 지우고 쓰면 그 블록이 망가져(Bad Block) SSD 전체 수명이 줄어듭니다.</p>
+            <p>따라서 특정 블록만 혹사당하지 않도록, 데이터를 플래시 메모리 전체에 <strong>골고루 분산시켜서 기록</strong>하는 수명 평준화 기술입니다.</p>
+<div class="diagram">
+[Block 1] 지움 횟수: 1000번 (혹사 당함 🥵)
+[Block 2] 지움 횟수: 10번 (쉬고 있음 😴)
+      ⬇ (웨어 레벨링 발동)
+자주 변하는 데이터(Hot Data)를 [Block 2]로 이동!
+수명을 골고루 맞춘다!
+</div>
+        </div>
+
+        <div class="card" id="ftl-op">
+            <h2>5. 오버 프로비저닝 (Over-Provisioning, OP)</h2>
+            <span class="badge">핵심 기능 4</span>
+            <p>가비지 컬렉션(GC)이나 웨어 레벨링, 배드 블록 대체를 원활하게 수행하기 위해 <strong>사용자에게는 숨겨둔 예비 여유 공간</strong>입니다. (예: 256GB SSD에 실제로는 275GB 낸드가 들어있음)</p>
+        </div>
+    </div>
+
+    <!-- 퀴즈 탭 -->
+    <div id="quiz" class="section">
+        <div class="score-board" id="score-board">이해 달성률: 0%</div>
+        <div class="card" id="quiz-container">
+            <div class="quiz-question" id="question-text">질문이 로드됩니다...</div>
+            <div class="options" id="options-container"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="btn-next" id="btn-next" onclick="nextQuestion()">다음 문제 ➡</button>
+        </div>
+        <div id="quiz-finished" style="display:none; text-align:center;">
+            <h2>🎉 테스트 완료!</h2>
+            <p>오답 가중치가 저장되었습니다. 다시 응시하면 취약했던 문제가 더 자주 출제됩니다.</p>
+            <button class="btn-next" style="display:inline-block;" onclick="startQuiz()">테스트 다시 시작</button>
+        </div>
+    </div>
+</main>
+
+<script>
+    const allQuestions = [
+        { id: 1, q: "NAND 플래시 메모리는 하드디스크와 달리 특정 위치의 데이터를 덮어쓰기(Overwrite)할 수 없다.", options: ["O", "X"], ans: 0, ref: "ftl-intro", exp: "NAND는 덮어쓰기가 불가능하여 무조건 지우기(Erase) 후 쓰기(Program)를 해야 합니다." },
+        { id: 2, q: "호스트가 요청한 논리 주소(LBA)를 실제 낸드 메모리의 물리 주소(PBA)로 연결해주는 FTL의 기능은?", options: ["Garbage Collection", "Wear Leveling", "Address Mapping", "Over Provisioning"], ans: 2, ref: "ftl-mapping", exp: "LBA와 PBA를 연결하는 변환 테이블 관리가 Address Mapping입니다." },
+        { id: 3, q: "NAND의 빈 공간이 부족해질 때, 여러 블록에 흩어진 유효 데이터(Valid)만 새 블록으로 모으고 기존 블록을 지우는 작업은?", options: ["Garbage Collection (GC)", "Wear Leveling", "Trim", "Mapping"], ans: 0, ref: "ftl-gc", exp: "찌꺼기를 지우고 빈 블록을 확보하는 과정이 Garbage Collection입니다." },
+        { id: 4, q: "GC(가비지 컬렉션)가 발생하면 SSD의 성능(Latency)에 어떤 영향을 미치는가?", options: ["성능이 매우 빨라진다.", "영향이 없다.", "내부 읽기/쓰기가 폭증하여 응답 속도가 현저히 느려진다.", "호스트의 CPU 부하가 증가한다."], ans: 2, ref: "ftl-gc", exp: "내부적으로 데이터를 옮기고 지우는 무거운 작업이 발생하므로 지연(Latency) 병목이 발생합니다." },
+        { id: 5, q: "특정 블록만 반복적으로 지워져 수명이 다하는 것을 막기 위해, 데이터를 낸드 전체에 골고루 분산 기록하는 기술은?", options: ["Garbage Collection", "Wear Leveling", "Mapping", "Over-Provisioning"], ans: 1, ref: "ftl-wl", exp: "웨어 레벨링(Wear Leveling)은 모든 블록의 마모도(지움 횟수)를 평준화하여 수명을 연장합니다." },
+        { id: 6, q: "가비지 컬렉션과 배드 블록 교체를 원활하게 하기 위해, 사용자에게 숨겨놓은 예비 플래시 용량을 무엇이라 하는가?", options: ["Cache Memory", "Over-Provisioning (OP)", "Mapping Table", "Swap Space"], ans: 1, ref: "ftl-op", exp: "오버 프로비저닝(OP)은 원활한 FTL 백그라운드 작업을 위한 물리적 예비 공간입니다." },
+        { id: 7, q: "데이터가 업데이트될 때, FTL은 기존 데이터를 어떻게 처리하는가?", options: ["기존 데이터 위치에 그대로 덮어쓴다.", "기존 데이터를 무효화(Invalid) 처리하고 새로운 공간에 쓴다.", "기존 데이터를 삭제(Erase)할 때까지 대기한다.", "호스트에 에러를 반환한다."], ans: 1, ref: "ftl-mapping", exp: "덮어쓰기가 불가하므로 구 데이터는 Invalid 처리하고 빈 페이지에 새 데이터를 씁니다." }
+    ];
+
+    let weights = JSON.parse(localStorage.getItem('ftl_weights')) || {};
+    allQuestions.forEach(q => { if(!weights[q.id]) weights[q.id] = 1; });
+
+    let currentSession = [];
+    let currentIndex = 0;
+    let correctCount = 0;
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(tabId === 'quiz') startQuiz();
+    }
+
+    function weightedRandomSelect(items, count) {
+        let selected = [];
+        let tempItems = [...items];
+        for(let i=0; i<count && tempItems.length>0; i++) {
+            let totalWeight = tempItems.reduce((sum, item) => sum + weights[item.id], 0);
+            let r = Math.random() * totalWeight;
+            let sum = 0;
+            for(let j=0; j<tempItems.length; j++) {
+                sum += weights[tempItems[j].id];
+                if(r <= sum) {
+                    selected.push(tempItems[j]);
+                    tempItems.splice(j, 1);
+                    break;
+                }
+            }
+        }
+        return selected;
+    }
+
+    function startQuiz() {
+        document.getElementById('quiz-container').style.display = 'block';
+        document.getElementById('quiz-finished').style.display = 'none';
+        currentSession = weightedRandomSelect(allQuestions, 5); // 5문제 출제
+        currentIndex = 0;
+        correctCount = 0;
+        updateScore();
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = currentSession[currentIndex];
+        document.getElementById('question-text').innerText = `Q${currentIndex+1}. ${q.q}`;
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        document.getElementById('feedback').classList.remove('show');
+        document.getElementById('btn-next').style.display = 'none';
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIndex, btn) {
+        const q = currentSession[currentIndex];
+        const options = document.querySelectorAll('.option');
+        options.forEach(o => o.onclick = null); // disable clicks
+
+        const feedback = document.getElementById('feedback');
+        
+        if(selectedIndex === q.ans) {
+            btn.classList.add('correct');
+            feedback.innerHTML = `✅ 정답입니다!<br><span style="font-weight:normal;">${q.exp}</span>`;
+            feedback.style.backgroundColor = '#dcfce7';
+            feedback.style.color = 'var(--success)';
+            correctCount++;
+            weights[q.id] = Math.max(1, weights[q.id] - 1); // 맞추면 가중치 감소
+        } else {
+            btn.classList.add('wrong');
+            options[q.ans].classList.add('correct');
+            feedback.innerHTML = `❌ 틀렸습니다.<br><span style="font-weight:normal;">${q.exp}</span><br><br>💡 <a href="#" onclick="switchTab('study'); document.getElementById('${q.ref}').scrollIntoView(); return false;">개념 다시 보기 (클릭)</a>`;
+            feedback.style.backgroundColor = '#fee2e2';
+            feedback.style.color = 'var(--danger)';
+            weights[q.id] += 3; // 틀리면 가중치 대폭 증가 (자주 출제)
+        }
+        
+        localStorage.setItem('ftl_weights', JSON.stringify(weights));
+        feedback.classList.add('show');
+        document.getElementById('btn-next').style.display = 'inline-block';
+        updateScore();
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if(currentIndex < currentSession.length) {
+            showQuestion();
+        } else {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('quiz-finished').style.display = 'block';
+        }
+    }
+
+    function updateScore() {
+        const pct = currentSession.length > 0 ? Math.round((correctCount / currentSession.length) * 100) : 0;
+        document.getElementById('score-board').innerText = `현재 테스트 이해 달성률: ${pct}% (${correctCount}/${currentSession.length})`;
+    }
+</script>
+
+</body>
+</html>
