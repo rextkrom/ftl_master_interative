@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAND Flash 마스터: Senior Staff Firmware Engineer 편</title>
+    <style>
+        :root {
+            --primary: #0891b2;
+            --primary-hover: #0e7490;
+            --primary-light: #ecfeff;
+            --secondary: #2563eb;
+            --accent: #d97706;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-elevated: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --code-bg: #1e293b;
+            --code-text: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --primary: #06b6d4;
+            --primary-hover: #22d3ee;
+            --primary-light: #164e63;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --bg: #0b0f19;
+            --surface: #131b2e;
+            --surface-elevated: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #243048;
+            --border-hover: #334155;
+            --danger: #f87171;
+            --danger-bg: #450a0a;
+            --success: #34d399;
+            --success-bg: #064e3b;
+            --warning: #fbbf24;
+            --warning-bg: #451a03;
+            --code-bg: #030712;
+            --code-text: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-top {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .brand-title .tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-theme {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+        }
+
+        nav.tabs-nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.25rem;
+            display: flex;
+            gap: 0.35rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        nav.tabs-nav::-webkit-scrollbar { display: none; }
+
+        button.tab-btn {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            padding: 0.75rem 0.9rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        button.tab-btn:hover { color: var(--primary); }
+        button.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        main {
+            max-width: 1200px;
+            margin: 1.75rem auto 3rem auto;
+            padding: 0 1.25rem;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-full { margin-bottom: 1.5rem; }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow);
+            border-color: var(--border-hover);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-phys { background: #cffafe; color: #155e75; }
+        .badge-level { background: #dbeafe; color: #1e40af; }
+        .badge-bics { background: #fef3c7; color: #92400e; }
+        .badge-bus { background: #ede9fe; color: #5b21b6; }
+        .badge-noise { background: #fee2e2; color: #991b1b; }
+        [data-theme="dark"] .badge-phys { background: #164e63; color: #a5f3fc; }
+        [data-theme="dark"] .badge-level { background: #1e3a8a; color: #bfdbfe; }
+        [data-theme="dark"] .badge-bics { background: #78350f; color: #fde68a; }
+        [data-theme="dark"] .badge-bus { background: #4c1d95; color: #ddd6fe; }
+        [data-theme="dark"] .badge-noise { background: #7f1d1d; color: #fecaca; }
+
+        h2.section-header {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text);
+            margin: 1.5rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-left: 5px solid var(--primary);
+            padding-left: 0.75rem;
+        }
+
+        h3.sub-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 1.25rem 0 0.5rem 0;
+        }
+
+        p { margin-bottom: 0.85rem; color: var(--text); }
+        ul, ol { margin: 0.5rem 0 1rem 1.4rem; color: var(--text); }
+        li { margin-bottom: 0.35rem; }
+
+        .callout {
+            padding: 1rem 1.15rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            font-size: 0.92rem;
+        }
+        .callout-info { background: var(--primary-light); border-color: var(--primary); }
+        .callout-warn { background: var(--warning-bg); border-color: var(--warning); }
+        .callout-success { background: var(--success-bg); border-color: var(--success); }
+        .callout-title {
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Diagrams */
+        .diagram-box {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.15rem;
+            border-radius: 8px;
+            font-family: ui-monospace, "SF Mono", "Fira Code", Menlo, Monaco, Consolas, "Courier New", monospace;
+            font-size: 0.86rem;
+            line-height: 1.48;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            letter-spacing: 0;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            background: var(--surface);
+            text-align: left;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg);
+            font-weight: 700;
+            color: var(--text);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: rgba(8, 145, 178, 0.04); }
+
+        .formula {
+            display: inline-block;
+            background: var(--bg);
+            border: 1px dashed var(--border);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-family: "SF Mono", Consolas, monospace;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0.4rem 0;
+        }
+
+        .pill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.75rem 0 1.25rem 0;
+        }
+        .pill {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.7rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Quiz UI */
+        .quiz-panel { max-width: 860px; margin: 0 auto; }
+        .quiz-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .quiz-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        .quiz-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .quiz-question-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .quiz-q-num {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .quiz-q-category {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .quiz-question-title {
+            font-size: 1.18rem;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+        }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.65rem; }
+        .quiz-option {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.9rem 1.15rem;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--text);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: var(--bg);
+            transform: translateY(-1px);
+        }
+        .quiz-option.selected-correct {
+            background: var(--success-bg) !important;
+            border-color: var(--success) !important;
+            color: var(--text) !important;
+            font-weight: 600;
+        }
+        .quiz-option.selected-wrong {
+            background: var(--danger-bg) !important;
+            border-color: var(--danger) !important;
+            color: var(--text) !important;
+        }
+        .quiz-option.show-correct {
+            border-color: var(--success) !important;
+            background: var(--success-bg) !important;
+        }
+        .quiz-feedback {
+            margin-top: 1.25rem;
+            padding: 1.25rem;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.2s;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback-correct { background: var(--success-bg); border-left: 4px solid var(--success); }
+        .quiz-feedback-wrong { background: var(--danger-bg); border-left: 4px solid var(--danger); }
+
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-action:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--surface-elevated); border-color: var(--border-hover); }
+
+        .filter-group { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .filter-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .highlight-target { animation: highlightPulse 2s ease; }
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.6); }
+            70% { box-shadow: 0 0 0 6px rgba(8, 145, 178, 0.2); }
+            100% { box-shadow: var(--shadow); }
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            padding: 2rem 1.25rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <a href="#" class="brand-title" onclick="switchTab('phys'); return false;">
+            <span>🔬 NAND Flash 마스터</span>
+            <span class="tag">Senior Staff Edition</span>
+        </a>
+        <div class="header-controls">
+            <a href="index.html" class="btn-theme" style="text-decoration:none;">🏠 포털 홈</a>
+            <a href="ftl.html" class="btn-theme" style="text-decoration:none; background:var(--primary-light); color:var(--primary); border-color:var(--primary);">⚡ FTL 마스터 편 ➔</a>
+            <button class="btn-theme" onclick="toggleTheme()" id="theme-btn">🌙 다크모드</button>
+        </div>
+    </div>
+    <nav class="tabs-nav">
+        <button class="tab-btn active" id="tab-phys" onclick="switchTab('phys')">🔬 1. 셀 물리 & 구조</button>
+        <button class="tab-btn" id="tab-levels" onclick="switchTab('levels')">📊 2. 셀 레벨(SLC~QLC) & ISPP</button>
+        <button class="tab-btn" id="tab-bics" onclick="switchTab('bics')">🏗️ 3. 3D BiCS 기술 & 다이 구조</button>
+        <button class="tab-btn" id="tab-bus" onclick="switchTab('bus')">⚡ 4. 버스 인터페이스 & 타이밍</button>
+        <button class="tab-btn" id="tab-noise" onclick="switchTab('noise')">⚠️ 5. 물리 결함 & 노이즈</button>
+        <button class="tab-btn" id="tab-char" onclick="switchTab('char')">🎖️ 6. 낸드 특성화 & 펌웨어 협업</button>
+        <button class="tab-btn" id="tab-sim" onclick="switchTab('sim')">🎮 7. 인터랙티브 시뮬레이터</button>
+        <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">🎯 8. 실전 모의고사</button>
+    </nav>
+</header>
+
+<main>
+    <!-- ==================== TAB 1: CELL PHYSICS & STRUCTURE ==================== -->
+    <div id="phys" class="section active">
+        <div class="pill-list">
+            <a href="#phys-ctf" class="pill">FG vs CTF 구조 비교</a>
+            <a href="#phys-tunneling" class="pill">FN 터널링 (Program/Erase)</a>
+            <a href="#phys-string" class="pill">NAND Cell String 직렬 구조</a>
+            <a href="#phys-nandnor" class="pill">NAND vs NOR 플래시 비교</a>
+        </div>
+
+        <div class="card grid-full" id="phys-ctf">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-phys">Cell Physics</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">1. Floating Gate (FG) vs Charge Trap Flash (CTF)</h2>
+                </div>
+            </div>
+            <p>NAND 플래시 셀은 전하를 가두어 트랜지스터의 <strong>문턱 전압(Vth, Threshold Voltage)</strong>을 변화시키는 비휘발성 메모리 소자입니다. 2D Planar 시절 사용되던 <strong>Floating Gate(도체)</strong> 방식과 현대 3D BiCS NAND의 표준인 <strong>Charge Trap Flash(부도체 질화막)</strong> 방식의 차이를 이해하는 것은 미디어 제어의 첫걸음입니다.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <tr><th>비교 항목</th><th>Floating Gate (FG - 2D 평면 낸드 표준)</th><th>Charge Trap Flash (CTF - 3D 낸드 표준)</th></tr>
+                    <tr><td><strong>전하 저장 물질</strong></td><td><strong>도체 (Conductive Poly-Si)</strong></td><td><strong>부도체 질화막 (Insulating Si3N4)</strong></td></tr>
+                    <tr><td><strong>전하 누설 특성</strong></td><td>산화막에 미세 결함(Crack) 1개만 생겨도 도체 내 모든 전하가 일제히 방전</td><td>전하가 국소적인 Deep Trap 사이트에 고립 포획되어 결함 발생 시에도 전하 보존 우수</td></tr>
+                    <tr><td><strong>셀 간 간섭 (Crosstalk)</strong></td><td>인접 플로팅 게이트 간 높은 기생 커패시턴스 간섭 유발 (15nm 이하 축소 불가)</td><td>트랩 두께가 얇고 연속적이지 않아 셀 간 커플링 간섭 극소화</td></tr>
+                    <tr><td><strong>공정 및 3D 적층</strong></td><td>3D 수직 원통형으로 균일하게 에칭 및 패터닝하기 극도로 어려움</td><td>Gate-All-Around (GAA) 원통형 채널 홀 공정에 완벽 부합 (BiCS의 핵심)</td></tr>
+                </table>
+            </div>
+
+            <div class="diagram-box">
+[ Charge Trap Flash (CTF) 셀 수직 단면 구조 ]
+Control Gate (Wordline) ──── [ Metal / TaN / W ]
+Blocking Oxide          ──── [ Al2O3 / SiO2 (고유전율 절연막) ]
+Charge Trapping Layer   ──── [ Si3N4 (질화막 - 전자가 갇히는 트랩 자리) ]
+Tunneling Oxide         ──── [ Ultra-thin SiO2 (고전압 시 전자가 터널링하는 산화막) ]
+Silicon Channel         ──── [ Poly-Si (전류가 흐르는 마카로니 채널 기둥) ]
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- FN Tunneling -->
+            <div class="card" id="phys-tunneling">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-phys">Operation Mechanism</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">2. Fowler-Nordheim (FN) 터널링</h2>
+                    </div>
+                </div>
+                <p>NAND 플래시는 셀을 프로그램(쓰기)하고 소거(지우기)할 때 <strong>Fowler-Nordheim (FN) 양자 터널링</strong> 방식을 사용합니다.</p>
+                <div class="callout callout-info">
+                    <div class="callout-title">프로그램(Program) 동작 원리</div>
+                    <p>Control Gate에 높은 양전압(<strong>Vpgm ≈ +15V ~ +20V</strong>)을 인가하고 채널을 0V(접지)로 유지하면, 강한 수직 전기장이 형성되어 채널의 전자가 얇은 터널 산화막의 삼각 전위 장벽을 뚫고 <strong>트랩 층(Si3N4)으로 주입</strong>됩니다. 결과적으로 문턱 전압($V_{th}$)이 양(+)의 방향으로 상승합니다.</p>
+                </div>
+                <div class="callout callout-warn">
+                    <div class="callout-title">소거(Erase) 동작 원리</div>
+                    <p>기판(P-Well)에 고전압(<strong>Verase ≈ +20V</strong>)을 걸고 Control Gate를 0V로 접지합니다. 트랩 층에 갇혀 있던 전자들이 기판으로 일제히 빠져나가며, 셀의 $V_{th}$는 <strong>음수(Negative, 보통 -1V ~ -3V)</strong>의 소거 상태(Erase State)로 복원됩니다.</p>
+                </div>
+            </div>
+
+            <!-- NAND String -->
+            <div class="card" id="phys-string">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-phys">String Architecture</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. NAND Cell String 직렬 연결 구조</h2>
+                    </div>
+                </div>
+                <p>NAND 플래시의 가장 핵심적인 특징은 셀들이 비트라인(Bitline)과 소스라인(Source Line) 사이에 <strong>직렬(In Series)로 연결</strong>되어 있다는 점입니다.</p>
+                <div class="diagram-box">
+Bitline (BL)
+   │
+[ String Select Line (SSL) Transistor ]
+   │
+ [ Cell WLn   ] ── Vpass (6~7V) 도통
+ [ Cell ...   ] ── Vpass (6~7V) 도통
+ [ Cell WL2   ] ── Vread (판독 전압 인가!)
+ [ Cell WL1   ] ── Vpass (6~7V) 도통
+ [ Cell WL0   ] ── Vpass (6~7V) 도통
+   │
+[ Ground Select Line (GSL) Transistor ]
+   │
+Common Source Line (CSL)
+                </div>
+                <p style="font-size:0.88rem; color:var(--text-muted);">
+                    <strong>판독(Read) 메커니즘:</strong> 선택된 WL2 셀의 데이터를 읽기 위해, 나머지 모든 비선택 WL(WL0, WL1, WL3..WLn)에는 <strong>Vpass (약 6~7V)</strong>의 고전압을 걸어 데이터와 상관없이 무조건 켜지게 만듭니다. 그 후 WL2에 판독 전압(Vread)을 걸어 비트라인에 전류가 흐르면 '1', 차단되면 '0'으로 판독합니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="card grid-full" id="phys-nandnor">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-phys">Flash Comparison</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">4. NAND Flash vs NOR Flash 비교</h2>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>비교 항목</th><th>NAND Flash</th><th>NOR Flash</th></tr>
+                    <tr><td><strong>셀 연결 구조</strong></td><td><strong>직렬 연결 (String 구조)</strong></td><td><strong>병렬 연결 (각 셀이 BL에 직접 연결)</strong></td></tr>
+                    <tr><td><strong>셀 면적 (Cell Size)</strong></td><td><strong>4F² (극단적인 집적도, 저비용)</strong></td><td>10F² (접촉 비아가 많아 면적이 큼)</td></tr>
+                    <tr><td><strong>읽기 속도 (Random Read)</strong></td><td>느림 (스트링 저항 및 Page Buffer 로드 필요, 20~80μs)</td><td><strong>초고속 (바이트 단위 직접 액세스, 수십 ns)</strong></td></tr>
+                    <tr><td><strong>쓰기 / 지우기 속도</strong></td><td><strong>빠름 (페이지/블록 일괄 터널링)</strong></td><td>느림 (핫 전자 주입 방식, Erase 수 초 소요)</td></tr>
+                    <tr><td><strong>XIP (Execute-in-Place)</strong></td><td>불가 (OS/RAM으로 복사 후 실행 필수)</td><td><strong>가능 (CPU가 플래시에서 직접 코드 실행)</strong></td></tr>
+                    <tr><td><strong>주요 응용처</strong></td><td><strong>대용량 저장장치 (SSD, eMMC, UFS, SD카드)</strong></td><td>BIOS / UEFI 롬, 부트로더, 자동차 MCU 펌웨어</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 2: CELL LEVELS & ISPP ==================== -->
+    <div id="levels" class="section">
+        <div class="pill-list">
+            <a href="#level-types" class="pill">SLC, MLC, TLC, QLC 비교</a>
+            <a href="#level-ispp" class="pill">ISPP 프로그래밍 제어</a>
+            <a href="#level-gray" class="pill">Gray Code & 논리 페이지 매핑</a>
+            <a href="#level-multipass" class="pill">Multi-Pass (Foggy-Fine) Program</a>
+        </div>
+
+        <div class="card grid-full" id="level-types">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-level">Cell Density</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">1. 셀 레벨 발전 (SLC, MLC, TLC, QLC, PLC)</h2>
+                </div>
+            </div>
+            <p>1개의 물리적 메모리 셀에 몇 비트의 정보를 저장하느냐에 따라 셀 레벨이 결정됩니다. 비트 수가 1씩 증가할 때마다 구분해야 하는 문턱 전압(Vth) 상태의 수는 <strong>2의 거듭제곱(2ⁿ)</strong>으로 급증합니다.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <tr><th>타입</th><th>셀당 비트</th><th>전압 상태 수</th><th>상태 구분</th><th>P/E Cycle 수명</th><th>신뢰성 및 특징</th></tr>
+                    <tr><td><strong>SLC</strong> (Single Level)</td><td>1 bit</td><td><strong>2개 (2¹)</strong></td><td>Erase, P1</td><td>~100,000 회</td><td>초고속, 극저지연, 엔터프라이즈 캐시/저널용</td></tr>
+                    <tr><td><strong>MLC</strong> (Multi Level)</td><td>2 bit</td><td><strong>4개 (2²)</strong></td><td>E, P1, P2, P3</td><td>~3,000 ~ 10,000 회</td><td>레거시 고신뢰성 SSD</td></tr>
+                    <tr><td><strong>TLC</strong> (Triple Level)</td><td>3 bit</td><td><strong>8개 (2³)</strong></td><td>E, P1 ~ P7</td><td>~1,000 ~ 3,000 회</td><td><strong>현재 전 세계 메인스트림 SSD의 85% 이상</strong></td></tr>
+                    <tr><td><strong>QLC</strong> (Quad Level)</td><td>4 bit</td><td><strong>16개 (2⁴)</strong></td><td>E, P1 ~ P15</td><td>~500 ~ 1,000 회</td><td>대용량 아카이빙/데이터센터 스토리지</td></tr>
+                    <tr><td><strong>PLC</strong> (Penta Level)</td><td>5 bit</td><td><strong>32개 (2⁵)</strong></td><td>E, P1 ~ P31</td><td>~수백 회 미만</td><td>초고밀도 연구 진행 중 (노이즈 마진 극소)</td></tr>
+                </table>
+            </div>
+
+            <div class="callout callout-warn">
+                <div class="callout-title">⚠️ Vth 전압 윈도우 한계와 마진 축소의 딜레마</div>
+                <p>NAND 셀의 물리적 최대 내압 한계로 인해 쓸 수 있는 총 전압 범위는 약 <strong>5V~6V</strong>로 고정되어 있습니다. 이 좁은 전압 창 안에 SLC는 2개, TLC는 8개, QLC는 16개의 상태를 우겨넣어야 하므로, 상태 간 간격(Noise Margin)이 밀리볼트(mV) 단위로 좁아져 미세한 전하 누설이나 간섭에도 비트 에러(RBER)가 폭증하게 됩니다.</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- ISPP -->
+            <div class="card" id="level-ispp">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-level">Program Algorithm</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">2. ISPP (Incremental Step Pulse Programming)</h2>
+                    </div>
+                </div>
+                <p>NAND는 셀에 전압을 한 번에 세게 걸면 전자가 과도하게 주입되어 목표 전압을 초과(Over-programming)하므로, <strong>ISPP 계단식 펄스 알고리즘</strong>을 사용합니다.</p>
+                <div class="diagram-box">
+Program Voltage (Vpgm)
+  ▲
+  │        ┌─┐               ┌─┐
+  │        │ │ Verify Pass?  │ │
+  │  ┌─┐   │ │ (PV1 검증)    │ │
+  │  │ │   │ │               │ │
+  │──┴─┴───┴─┴───────────────┴─┴───▶ Time
+    Pulse1   Pulse2 (+ΔVispp) Pulse3 (+ΔVispp)
+                </div>
+                <ul>
+                    <li><strong>스텝 전압 ($\Delta V_{ISPP}$):</strong> 펄스마다 전압을 약 0.2V~0.4V씩 계단식으로 상승 인가.</li>
+                    <li><strong>Program Verify (PV):</strong> 펄스 직후 목표 전압에 도달했는지 확인. 도달한 비트는 비트라인을 Vcc로 올려 추가 프로그래밍을 차단(Inhibit).</li>
+                    <li><strong>엔지니어링 트레이드오프:</strong> $\Delta V_{ISPP}$를 작게 쪼갤수록 Vth 분포 폭이 예리해져 신뢰성이 높아지지만, 반복 루프 횟수가 늘어나 쓰기 속도($t_{PROG}$)가 느려집니다.</li>
+                </ul>
+            </div>
+
+            <!-- Gray Code & Multi-Pass -->
+            <div class="card" id="level-gray">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-level">Page Mapping</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. Gray Code & Multi-Pass (Foggy-Fine) Program</h2>
+                    </div>
+                </div>
+                <p>1개 셀에 3비트(TLC)가 들어갈 때, 이 3개 비트는 동일한 페이지에 묶이지 않고 <strong>Lower Page, Middle Page, Upper Page</strong>라는 완전히 독립된 3개의 논리 페이지로 분산 매핑됩니다.</p>
+                <div class="callout callout-info">
+                    <div class="callout-title">왜 Gray Code를 사용하는가?</div>
+                    <p>인접한 Vth 전압 상태 간에 오직 <strong>1비트만 차이</strong>가 나도록 코드를 배치(예: 111 ➔ 110 ➔ 100 ➔ 101...)합니다. 이렇게 하면 Vth 전압이 노이즈로 인해 이웃 상태로 살짝 넘어가더라도 최대 1비트의 에러만 발생하여 하드웨어 ECC(LDPC) 디코딩 부담을 최소화합니다.</p>
+                </div>
+                <div class="callout callout-info" id="level-multipass">
+                    <div class="callout-title">Multi-Pass (Foggy-Fine) Program</div>
+                    <p>인접 셀 간 기생 커패시턴스 간섭을 줄이기 위해, 먼저 대략적인 거친 전압으로 프로그래밍(Foggy Step)한 뒤, 인접 워드라인이 프로그래밍된 후 미세 정밀 전압(Fine Step)으로 최종 목표치까지 끌어올립니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 3: 3D BICS & DIE ARCHITECTURE ==================== -->
+    <div id="bics" class="section">
+        <div class="pill-list">
+            <a href="#bics-evo" class="pill">3D BiCS 기술 혁신</a>
+            <a href="#bics-tiers" class="pill">Multi-Tier & Bonding 공정</a>
+            <a href="#bics-cua" class="pill">CuA / PUC / CBA 아키텍처</a>
+            <a href="#bics-planes" class="pill">Multi-Plane & 다이 병렬 구조</a>
+        </div>
+
+        <div class="card grid-full" id="bics-evo">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-bics">3D NAND Tech</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">1. 2D Planar 한계와 3D BiCS (Bit Cost Scaling) 혁신</h2>
+                </div>
+            </div>
+            <p>2D 평면 플래시는 15nm 이하로 선폭을 줄이자 인접 셀 간 간섭이 걷잡을 수 없이 커지고, 셀에 갇히는 전자 수가 불과 수십 개 수준으로 떨어져 물리적 한계에 부딪혔습니다. SanDisk와 Kioxia는 셀을 수평으로 좁히는 대신 <strong>수직으로 쌓아 올리는 BiCS (Bit Cost Scaling) 3D NAND 기술</strong>을 개발했습니다.</p>
+
+            <div class="diagram-box">
+[ 3D BiCS Through-Silicon Hole 원리 ]
+수십~수백 층의 Oxide/Nitride 박막 교대 적층 ➔ 초미세 원통형 홀(Hole) 수직 일괄 에칭 ➔ 
+내벽에 ONO 절연막 증착 ➔ 중앙에 채널(Poly-Si) 기둥 형성 ➔ Gate-All-Around (GAA) 원통형 셀 완성!
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Multi-Tier & Stacking -->
+            <div class="card" id="bics-tiers">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-bics">Stacking Process</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">2. BiCS 세대별 스펙 (ISSCC / IEDM 공표)</h2>
+                    </div>
+                </div>
+                <p>Kioxia와 Western Digital의 독자적인 3D NAND인 <strong>BiCS (Bit Cost Scaling)</strong> 시리즈의 세대별 진화 스펙입니다.</p>
+                <div class="table-responsive">
+                    <table>
+                        <tr><th>세대</th><th>적층 단수</th><th>로직 통합 방식</th><th>I/O 버스 속도</th><th>특징 및 성능 도약</th></tr>
+                        <tr><td><strong>BiCS5</strong></td><td>112단</td><td>표준 2-Tier Stack</td><td>1200 MT/s</td><td>TLC 512Gb / 1Tb 메인스트림</td></tr>
+                        <tr><td><strong>BiCS6</strong></td><td>162단</td><td><strong>CUA (CMOS Under Array)</strong></td><td>2000 MT/s</td><td>4-plane 구조, 다이 사이즈 40% 축소, 쓰기 성능 2.4배 향상</td></tr>
+                        <tr><td><strong>BiCS8</strong></td><td><strong>218단</strong></td><td><strong>CBA (CMOS Directly Bonded to Array)</strong></td><td><strong>3200 ~ 4800 MT/s</strong></td><td>비트 밀도 18.3 Gb/mm², tR 40μs, 단일 다이 205MB/s, OPS 기술</td></tr>
+                    </table>
+                </div>
+                <ul>
+                    <li><strong>에칭 종횡비(Aspect Ratio) 극복:</strong> 200단 이상의 초고적층 홀을 한 번에 뚫으면 하단 직경이 좁아지므로, 100여 단씩 2개의 스택을 따로 에칭한 뒤 완벽히 정렬하여 접합합니다.</li>
+                    <li><strong>OPS (On-Pitch SGD):</strong> BiCS8에 도입된 기술로, 불필요한 더미 메모리 스트링을 제거하여 메모리 어레이 면적을 15% 줄이고 비선택 워드라인의 정전용량 부하(Capacitive Loading)를 대폭 경감했습니다.</li>
+                </ul>
+            </div>
+
+            <!-- CuA / PUC / CBA -->
+            <div class="card" id="bics-cua">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-bics">Die Area Optimization</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. CUA vs CBA (웨이퍼 하이브리드 본딩) 혁신</h2>
+                    </div>
+                </div>
+                <p>NAND 칩의 비트 밀도를 비약적으로 높이기 위한 주변 회로(Peri) 배치 기술의 진화입니다.</p>
+                <div class="callout callout-info">
+                    <div class="callout-title">1단계: CUA (Circuit Under Array) / PUC</div>
+                    <p>동일한 실리콘 웨이퍼 기판 위에 Row/Col 디코더와 펌프 회로를 먼저 만들고, 그 위에 3D 셀을 쌓는 방식입니다. 그러나 고전압 고열 3D 낸드 열처리 공정 때문에 하부 CMOS 트랜지스터의 고성능화에 제약이 따르는 한계가 있었습니다.</p>
+                </div>
+                <div class="callout callout-success">
+                    <div class="callout-title">2단계: CBA (CMOS Directly Bonded to Array) - BiCS8 표준</div>
+                    <p><strong>로직 CMOS 웨이퍼</strong>와 <strong>3D 낸드 메모리 셀 웨이퍼</strong>를 완전히 분리하여 각각 가장 진보된 최적 공정 노드에서 제조한 뒤, 웨이퍼 상태에서 <strong>Cu-to-Cu(구리 대 구리) 다이렉트 하이브리드 본딩</strong>으로 결합합니다. 이를 통해 주변 회로의 속도(최대 4.8Gbps)와 셀 어레이의 신뢰성을 동시에 독립적으로 극대화했습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card grid-full" id="bics-planes">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-bics">Internal Parallelism</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">4. Multi-Plane & 다이(Die) 내부 병렬 구조</h2>
+                </div>
+            </div>
+            <p>1개의 물리적 낸드 다이(Die) 내부는 독립된 구동 회로와 페이지 버퍼를 갖춘 <strong>2개 또는 4개의 플레인(Plane)</strong>으로 쪼개져 있습니다.</p>
+            <ul>
+                <li><strong>Dual-Plane / Quad-Plane 동시 동작:</strong> 서로 다른 플레인에 위치한 동일한 Row Address의 페이지를 동시에 읽거나(Multi-Plane Read) 동시에 쓸(Multi-Plane Program) 수 있어 낸드 내부 대역폭을 2~4배 확장합니다.</li>
+                <li><strong>Multi-Plane 동작 제약:</strong> 커맨드 발행 시 모든 플레인이 동일한 페이지 오프셋을 공유해야 하는 어드레스 제약 조건이 따릅니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 4: BUS INTERFACE & TIMING ==================== -->
+    <div id="bus" class="section">
+        <div class="pill-list">
+            <a href="#bus-protocols" class="pill">Toggle DDR vs ONFI 표준</a>
+            <a href="#bus-pins" class="pill">하드웨어 핀아웃 (CLE, ALE 등)</a>
+            <a href="#bus-cmds" class="pill">핵심 낸드 커맨드 시퀀스</a>
+            <a href="#bus-timings" class="pill">주요 타이밍 파라미터 (tR, tPROG)</a>
+        </div>
+
+        <div class="card grid-full" id="bus-protocols">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-bus">Flash Bus Standard</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">1. Toggle DDR (SanDisk/Samsung) vs ONFI (Micron/SK/Intel)</h2>
+                </div>
+            </div>
+            <p>SSD 컨트롤러와 NAND 플래시 다이 사이의 고속 플래시 버스 인터페이스는 양대 진영의 표준으로 양분되어 발전해 왔습니다.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <tr><th>항목</th><th>Toggle DDR (SanDisk, Kioxia, Samsung 주도)</th><th>ONFI (Open NAND Flash Interface - Micron, SK, Intel 주도)</th></tr>
+                    <tr><td><strong>데이터 스트로브</strong></td><td>양방향 DQS 신호 (Edge-aligned Read, Center-aligned Write)</td><td>동기식 클럭(CLK) 및 DQS 신호 조합</td></tr>
+                    <tr><td><strong>전송 모드</strong></td><td>DDR (Double Data Rate: 신호의 상승/하강 에지 양쪽에서 데이터 래치)</td><td>초기 SDR에서 출발하여 ONFI 3.0 이후 NV-DDR3/4/5로 고속화</td></tr>
+                    <tr><td><strong>최신 대역폭</strong></td><td><strong>Toggle 5.0 / 6.0: 2400 ~ 3200 MT/s</strong> (채널당 최대 3.2 GB/s)</td><td><strong>ONFI 5.1: 2400 ~ 3200 MT/s</strong></td></tr>
+                    <tr><td><strong>신호 레벨</strong></td><td>저전력 VCCQ 1.2V Sub-LVCMOS / Pod12 차동 신호</td><td>VCCQ 1.2V ZQ Calibration 임피던스 매칭 지원</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Pinout -->
+            <div class="card" id="bus-pins">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-bus">Hardware Signals</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">2. 낸드 하드웨어 제어 핀(Pinout)</h2>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <tr><th>신호선</th><th>명칭</th><th>동작 설명</th></tr>
+                        <tr><td><strong>CLE</strong></td><td>Command Latch Enable</td><td>High일 때 DQ 버스의 바이트를 커맨드로 인식</td></tr>
+                        <tr><td><strong>ALE</strong></td><td>Address Latch Enable</td><td>High일 때 DQ 버스의 바이트를 주소(Row/Col)로 인식</td></tr>
+                        <tr><td><strong>CE#</strong></td><td>Chip Enable</td><td>Low 액티브: 해당 낸드 다이를 활성화</td></tr>
+                        <tr><td><strong>WE#</strong></td><td>Write Enable</td><td>클럭 입력: 호스트가 낸드로 커맨드/주소/데이터 쓸 때 토글</td></tr>
+                        <tr><td><strong>RE# / DQS</strong></td><td>Read Enable / Data Strobe</td><td>낸드에서 호스트로 데이터 읽을 때 타이밍 동기화</td></tr>
+                        <tr><td><strong>R/B#</strong></td><td>Ready / Busy#</td><td>낸드 내부 연산 중(tR, tPROG, tBERS) Low로 떨어져 대기 상태 통지</td></tr>
+                        <tr><td><strong>DQ[7:0]</strong></td><td>Data Bus (8-bit)</td><td>커맨드, 주소, 입출력 데이터가 시분할 멀티플렉싱 전송되는 버스</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Command Sequences -->
+            <div class="card" id="bus-cmds">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-bus">Command Sequences</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. 핵심 낸드 커맨드 시퀀스</h2>
+                    </div>
+                </div>
+                <div class="diagram-box">
+1. Page Read Sequence (00h - 30h)
+[CLE] 00h ➔ [ALE] 5-Cycle Address ➔ [CLE] 30h ➔ [R/B# Low: tR 대기] ➔ [RE# Toggle Data Out]
+
+2. Page Program Sequence (80h - 10h)
+[CLE] 80h ➔ [ALE] 5-Cycle Address ➔ [DQ] Data In ➔ [CLE] 10h ➔ [R/B# Low: tPROG 대기] ➔ [Status 70h]
+
+3. Block Erase Sequence (60h - D0h)
+[CLE] 60h ➔ [ALE] 3-Cycle Row Address ➔ [CLE] D0h ➔ [R/B# Low: tBERS 대기] ➔ [Status 70h]
+                </div>
+                <p style="font-size:0.88rem; color:var(--text-muted);">
+                    <strong>Cache Program / Cache Read:</strong> 낸드 내부의 Page Buffer를 메인 래치와 캐시 래치의 듀얼 구조로 운용하여, 셀에 실제 기록되는 동안 버스에서 다음 데이터를 미리 전송받음으로써 버스 전송 시간을 은폐합니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="card grid-full" id="bus-timings">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-bus">Timing Parameters</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">4. 핵심 타이밍 파라미터 ($t_R$, $t_{PROG}$, $t_{BERS}$)</h2>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>파라미터</th><th>의미</th><th>SLC</th><th>TLC</th><th>QLC</th><th>펌웨어 설계 고려사항</th></tr>
+                    <tr><td><strong>$t_R$ (Read Time)</strong></td><td>셀에서 Page Buffer로 감지 로드하는 시간</td><td>약 20 ~ 25 μs</td><td>약 45 ~ 80 μs</td><td>약 100 ~ 150 μs</td><td>호스트 랜덤 읽기 IOPS 및 QD=1 지연시간 직결</td></tr>
+                    <tr><td><strong>$t_{PROG}$ (Program Time)</strong></td><td>Page Buffer에서 셀로 ISPP 쓰기 시간</td><td>약 200 ~ 300 μs</td><td>약 800 ~ 1,500 μs</td><td>약 2,000 ~ 4,000 μs</td><td>쓰기 버퍼 고갈 시 성능 절벽의 원인</td></tr>
+                    <tr><td><strong>$t_{BERS}$ (Block Erase)</strong></td><td>블록 전체를 고전압으로 소거하는 시간</td><td>약 2 ~ 3 ms</td><td>약 4 ~ 10 ms</td><td>약 10 ~ 15 ms</td><td><strong>Read 블록킹 유발 ➔ Erase Suspend 필수</strong></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 5: NOISE & RELIABILITY ==================== -->
+    <div id="noise" class="section">
+        <div class="pill-list">
+            <a href="#noise-retention" class="pill">Data Retention & Arrhenius</a>
+            <a href="#noise-readdisturb" class="pill">Read Disturb 메커니즘</a>
+            <a href="#noise-pgmdisturb" class="pill">Program Disturb & Self-Boosting</a>
+            <a href="#noise-crosstalk" class="pill">Cell Crosstalk & 산화막 열화</a>
+        </div>
+
+        <div class="grid-2">
+            <!-- Data Retention -->
+            <div class="card" id="noise-retention">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-noise">Reliability Failure 1</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">1. Data Retention & 아레니우스 모델</h2>
+                    </div>
+                </div>
+                <p>전하 트랩 층에 갇힌 전자가 시간이 흐름에 따라 열 에너지에 의해 절연 산화막을 뚫고 기판으로 자연 방전되는 현상입니다. 결과적으로 문턱 전압(Vth)이 <strong>낮은 쪽(좌측)</strong>으로 이동합니다.</p>
+                <div class="callout callout-info">
+                    <div class="callout-title">온도와 아레니우스(Arrhenius) 가속 수명 방정식</div>
+                    <p>보관 온도가 10°C 상승할 때마다 Retention 수명은 약 2배씩 급감합니다. JEDEC 표준은 활성화 에너지($E_a \approx 1.1\text{eV}$) 기반으로 고온 챔버 가속 시험(HTOL / Aging)을 통해 드라이브의 전원 차단 상태 1년/3년 데이터 보존을 검증합니다.</p>
+                </div>
+            </div>
+
+            <!-- Read Disturb -->
+            <div class="card" id="noise-readdisturb">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-noise">Reliability Failure 2</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">2. Read Disturb 메커니즘</h2>
+                    </div>
+                </div>
+                <p>특정 워드라인을 읽을 때, 같은 스트링의 다른 모든 비선택 셀들에 인가되는 <strong>Vpass (약 6~7V) 전압</strong>이 원인입니다.</p>
+                <div class="callout callout-warn">
+                    <div class="callout-title">소프트 프로그램(Soft Program) 현상</div>
+                    <p>Vpass는 읽기를 위해 무조건 켜지도록 가하는 전압이지만, 수십만 번 반복 인가되면 미세한 터널링이 발생하여 비선택 셀의 트랩 층으로 전자가 서서히 유입됩니다. 결과적으로 문턱 전압(Vth)이 <strong>높은 쪽(우측)</strong>으로 밀려나며 인접 상태와 충돌합니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Program Disturb -->
+            <div class="card" id="noise-pgmdisturb">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-noise">Reliability Failure 3</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. Program Disturb & Self-Boosting 메커니즘</h2>
+                    </div>
+                </div>
+                <p>선택된 워드라인에 20V 고전압(Vpgm)이 인가될 때, 쓰기를 원치 않는 스트링의 셀(Inhibited Cell)에 우발적으로 전자가 주입되는 결함입니다.</p>
+                <div class="callout callout-info">
+                    <div class="callout-title">Self-Boosting 기법의 진화</div>
+                    <ul>
+                        <li><strong>Basic Self-Boosting (BSB):</strong> SSL을 닫아 채널을 플로팅시킨 후 비선택 WL의 Vpass 전압과의 정전용량 결합으로 채널 전체를 8~10V로 균일 승압하여 전압 차를 축소.</li>
+                        <li><strong>Local Self-Boosting (LSB):</strong> 선택된 WL 양옆의 인접 WL에 0V를 인가하여 채널을 국소적으로 고립(Isolation)시킴으로써 선택 셀 바로 아래 채널만 집중적으로 승압.</li>
+                        <li><strong>Erased-Area Self-Boosting (EASB):</strong> 이미 프로그래밍된 셀 영역과 아직 비어있는 Erase 영역 사이의 채널 경계에서 발생하는 전하 누설을 차단하기 위해 선택 WL 직전 WL에 0V를 걸어 분리하는 고급 스킴.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Crosstalk & Endurance -->
+            <div class="card" id="noise-crosstalk">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-noise">Reliability Failure 4</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">4. Cell-to-Cell Coupling & 산화막 마모</h2>
+                    </div>
+                </div>
+                <ul>
+                    <li><strong>Parasitic Capacitive Coupling:</strong> 이웃 셀에 전자가 주입되면 기생 커패시턴스로 인해 이미 쓰여진 인접 셀의 겉보기 Vth가 덩달아 상승하는 현상. (순차적 WL 프로그래밍 규칙으로 방어).</li>
+                    <li><strong>Endurance 열화 & SILC (Stress-Induced Leakage Current):</strong> P/E Cycle이 반복되면서 터널 산화막 격자 결함(Traps)이 생성되어 누설 전류가 폭증하고 결국 절연 파괴(Breakdown)로 런타임 배드 블록 발생.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 6: CHARACTERIZATION & FMC ==================== -->
+    <div id="char" class="section">
+        <div class="pill-list">
+            <a href="#char-shmoo" class="pill">Shmoo Plot & RBER 모델링</a>
+            <a href="#char-valley" class="pill">Valley Search & 최적 Vref 탐색</a>
+            <a href="#char-fmc" class="pill">FMC 컨트롤러 & PHY 분리</a>
+            <a href="#char-fbbm" class="pill">Factory Bad Block & Defect 리맵핑</a>
+            <a href="#char-python" class="pill">Python 낸드 특성화 프레임워크</a>
+        </div>
+
+        <div class="card grid-full" id="char-shmoo">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-phys">Senior Staff Characterization</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">1. NAND 특성화(Characterization)와 RBER 모델링</h2>
+                </div>
+            </div>
+            <p>시니어 스태프 펌웨어 엔지니어는 낸드 제조사(SanDisk Fab)로부터 전달받은 원시 실리콘 다이의 전기적 특성을 소프트웨어 파라미터로 모델링해야 합니다.</p>
+            <div class="grid-2">
+                <div>
+                    <h3 class="sub-header">📈 Shmoo Plot (동작 마진 맵핑)</h3>
+                    <p>인가 전압(Vcc, Vpgm, Vread)과 동작 주파수/타이밍(tSetup, tHold, tWHR)의 축을 변화시키며 낸드가 에러 없이 동작하는 안전 구역(Pass/Fail Matrix)을 맵핑하여 펌웨어의 최악 마진(Worst-case Margin)을 산정합니다.</p>
+                </div>
+                <div>
+                    <h3 class="sub-header">📉 RBER Bathtub Curve (욕조 곡선)</h3>
+                    <p>초기 유아 사망(Infant Mortality) 결함 ➔ 안정적인 정상 구동 구간 ➔ 수명 고갈에 따른 RBER 기하급수적 급증 구간을 수학적으로 모델링하여 LDPC ECC 엔진의 Soft-decision 임계치와 맞바꿉니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Valley Search Algorithm -->
+        <div class="card grid-full" id="char-valley">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-phys">Advanced Firmware Algorithm</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">2. Valley Search (계곡 탐색) & Predictive Vref 알고리즘</h2>
+                </div>
+            </div>
+            <p>전통적인 Read Retry는 하드코딩된 RRT(Read Retry Table)를 1번부터 15번까지 순차 대입하므로 최악의 경우 수 밀리초(ms)의 심각한 읽기 지연(Tail Latency)이 발생합니다. 최신 고성능 SSD 펌웨어는 <strong>지능형 계곡 탐색(Valley Search)</strong>을 사용합니다.</p>
+            <div class="grid-2">
+                <div>
+                    <h3 class="sub-header">🔍 Valley Search 원리</h3>
+                    <p>인접한 두 문턱 전압(Vth) 분포가 겹치는 영역의 비트 반전 빈도를 실시간 카운트하여, 미분 기울기($\frac{d(\text{Error})}{dV} = 0$)가 0이 되는 극솟값(Valley)을 이분 탐색(Binary Search)이나 Proximity Search로 수 스텝 내에 고속 수렴시킵니다.</p>
+                </div>
+                <div>
+                    <h3 class="sub-header">🧠 Predictive Local Offset Caching</h3>
+                    <p>동일 블록 내의 인접 워드라인(WL)들은 제조 공정 산포와 열 이력(Retention), Read Disturb 스트레스가 매우 유사합니다. 특정 WL에서 산출된 최적 Vref 오프셋을 컨트롤러 캐시에 보관하고 이웃 페이지 읽기 시 초기 기준 전압으로 선제 적용하여 재시도 횟수를 80% 이상 단축합니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- FMC -->
+            <div class="card" id="char-fmc">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-phys">Hardware/Firmware Boundary</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">3. Flash Memory Controller (FMC)와 FTL 분리</h2>
+                    </div>
+                </div>
+                <p>펌웨어 코어가 낸드 핀을 직접 비트뱅잉(Bit-banging)하면 성능이 나지 않습니다. 현대 SSD 컨트롤러는 하드웨어 <strong>FMC (Flash Memory Controller)</strong> 시퀀서를 둡니다.</p>
+                <ul>
+                    <li><strong>Command Descriptor 큐잉:</strong> FTL은 메모리에 읽기/쓰기 커맨드 디스크립터만 큐잉하고, FMC 전용 하드웨어 엔진이 Toggle/ONFI 프로토콜 신호를 나노초 단위로 자동 생성.</li>
+                    <li><strong>Hardware Flash DMA:</strong> 수신된 낸드 데이터를 CPU 개입 없이 컨트롤러 SRAM/DRAM 및 LDPC ECC 디코더로 직통 스트리밍.</li>
+                </ul>
+            </div>
+
+            <!-- Bad Block -->
+            <div class="card" id="char-fbbm">
+                <div class="card-header">
+                    <div>
+                        <span class="card-badge badge-phys">Factory Defect Handling</span>
+                        <h2 class="card-title" style="margin-top:0.3rem;">4. Factory Bad Block (FBBM) & Defect Column 리맵핑</h2>
+                    </div>
+                </div>
+                <ul>
+                    <li><strong>Factory Bad Block Marker:</strong> 공장 출하 시 웨이퍼 검사에서 불합격된 블록은 첫 번째 또는 마지막 페이지의 스페어 영역 특정 바이트(예: 1st Byte)에 <code>00h</code> 비트를 기록하여 표시합니다. 펌웨어는 첫 부팅 시 절대 이 블록을 지우지 않고 스캔하여 초기 배드 블록 테이블을 구축해야 합니다.</li>
+                    <li><strong>Column Defect Replacement:</strong> 낸드 다이 내부에 예비 비트라인 컬럼(Spare Columns)을 두고 결함 비트라인을 온칩 퓨즈로 치환하여 단일 다이 수율을 방어합니다.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Python Characterization Code -->
+        <div class="card grid-full" id="char-python">
+            <div class="card-header">
+                <div>
+                    <span class="card-badge badge-phys">Python Engineering Tool</span>
+                    <h2 class="card-title" style="margin-top:0.3rem;">5. Python 기반 NAND 물리 특성화 & RBER Shmoo 분석 스크립트</h2>
+                </div>
+            </div>
+            <p>Senior Staff Firmware Engineer 직무에서 요구하는 <strong>Python 객체 지향 데이터 분석 및 특성화 파이프라인</strong>의 실제 구현 예제입니다. 낸드 테스트 벤치에서 수집된 전압별 RBER 데이터를 가공하여 최적의 Vref와 동작 윈도우를 도출합니다.</p>
+            <div class="diagram-box">
+<span style="color:#94a3b8;"># Python NAND Characterization & Optimal Vref Finder (Senior Staff Firmware Framework)</span>
+<span style="color:#38bdf8;">import</span> numpy <span style="color:#38bdf8;">as</span> np
+
+<span style="color:#38bdf8;">class</span> <span style="color:#fde68a;">NandCharacterizer</span>:
+    <span style="color:#38bdf8;">def</span> <span style="color:#a78bfa;">__init__</span>(self, die_id: int, block_id: int):
+        self.die_id = die_id
+        self.block_id = block_id
+        self.sweep_data = {}  <span style="color:#64748b;"># vref_offset -> raw_bit_error_count</span>
+
+    <span style="color:#38bdf8;">def</span> <span style="color:#a78bfa;">record_sweep_point</span>(self, vref_mv: int, bit_errors: int, total_bits: int = 131072):
+        rber = bit_errors / total_bits
+        self.sweep_data[vref_mv] = rber
+
+    <span style="color:#38bdf8;">def</span> <span style="color:#a78bfa;">find_optimal_vref_valley</span>(self) -> tuple[int, float]:
+        <span style="color:#64748b;">"""2차 다항식 피팅(Polynomial Fitting)을 통한 최저 계곡(Valley) 탐색"""</span>
+        offsets = np.array(list(self.sweep_data.keys()))
+        rbers = np.array(list(self.sweep_data.values()))
+        
+        <span style="color:#64748b;"># Fit quadratic curve: RBER = a*V^2 + b*V + c</span>
+        poly = np.polyfit(offsets, rbers, 2)
+        v_opt = -poly[1] / (2 * poly[0])  <span style="color:#64748b;"># d(RBER)/dV = 0</span>
+        min_rber = np.polyval(poly, v_opt)
+        <span style="color:#38bdf8;">return</span> int(round(v_opt)), float(min_rber)
+
+<span style="color:#64748b;"># 실제 사용 예시:</span>
+char = NandCharacterizer(die_id=0, block_id=128)
+<span style="color:#38bdf8;">for</span> v <span style="color:#38bdf8;">in</span> range(-20, 21, 5):
+    <span style="color:#64748b;"># 하드웨어 테스트 벤치로부터 에러 비트 수 획득</span>
+    errors = int(120 + 0.45 * (v - (-5))**2)
+    char.record_sweep_point(vref_mv=v, bit_errors=errors)
+
+opt_v, opt_rber = char.find_optimal_vref_valley()
+print(f<span style="color:#86efac;">"[Analysis] Optimal Vref Offset: {opt_v} mV, Predicted Min RBER: {opt_rber:.2e}"</span>)
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 7: SIMULATOR ==================== -->
+    <div id="sim" class="section">
+        <h2 class="section-header">🎮 NAND Flash 물리 & 인터페이스 시뮬레이터</h2>
+
+        <!-- Simulator 1: Vth Distribution Visualizer -->
+        <div class="card grid-full" id="sim-vth-box">
+            <h3 style="margin-bottom:0.5rem;">① SLC ~ QLC 문턱 전압($V_{th}$) 분포 & 노이즈 마진 시뮬레이터</h3>
+            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+                SLC에서 QLC로 갈수록 좁은 전압 창 안에 피크 수가 급증하여 마진이 어떻게 좁아지는지 확인하세요. P/E Cycle 노화 슬라이더를 올리면 산화막 마모로 인해 분포 곡선이 넓어져 상태 간 중첩(Bit Error)이 발생하는 현상을 직접 체험할 수 있습니다.
+            </p>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center;">
+                <label style="font-weight:700; font-size:0.9rem;">셀 레벨 선택:</label>
+                <button class="btn-action" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setNandSimMode('SLC')">SLC (2 상태)</button>
+                <button class="btn-action btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setNandSimMode('MLC')">MLC (4 상태)</button>
+                <button class="btn-action btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setNandSimMode('TLC')">TLC (8 상태)</button>
+                <button class="btn-action btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setNandSimMode('QLC')">QLC (16 상태)</button>
+            </div>
+
+            <div style="background:var(--code-bg); border-radius:8px; border:1px solid var(--border); height:200px; position:relative; overflow:hidden;">
+                <canvas id="nandVthCanvas" width="900" height="200" style="width:100%; height:100%;"></canvas>
+            </div>
+
+            <div style="margin-top:1rem; display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;">
+                <label style="font-weight:700; font-size:0.9rem;">P/E Cycle 노화 (산화막 마모):</label>
+                <input type="range" id="nand-wear-slider" min="0" max="100" value="0" style="flex:1; min-width:200px;" oninput="updateNandWear(this.value)">
+                <span id="nand-wear-display" style="font-family:monospace; font-weight:700; min-width:80px;">Fresh (0%)</span>
+            </div>
+
+            <div id="nand-margin-status" style="margin-top:0.75rem; font-size:0.9rem; font-weight:600; color:var(--success);">
+                ✅ 상태 간 노이즈 마진(Noise Margin) 충분: RBER 10⁻⁸ 미만 (Zero ECC Correction)
+            </div>
+        </div>
+
+        <!-- Simulator 2: Bus Timing Simulator -->
+        <div class="card grid-full" id="sim-timing-box">
+            <h3 style="margin-bottom:0.5rem;">② Toggle/ONFI Flash Bus 신호 타이밍 파형 시뮬레이터</h3>
+            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+                호스트 컨트롤러가 낸드로 Page Read, Page Program, Block Erase 커맨드를 전송할 때 핀(CLE, ALE, WE#, RE#, R/B#, DQ) 신호가 어떻게 토글되는지 실제 디지털 오실로스코프 파형으로 확인하세요.
+            </p>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center;">
+                <label style="font-weight:700; font-size:0.9rem;">명령 시퀀스 선택:</label>
+                <button class="btn-action" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setTimingSeq('READ')">Page Read (00h-30h)</button>
+                <button class="btn-action btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setTimingSeq('PROG')">Page Program (80h-10h)</button>
+                <button class="btn-action btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setTimingSeq('ERASE')">Block Erase (60h-D0h)</button>
+            </div>
+
+            <div style="background:var(--code-bg); border-radius:8px; border:1px solid var(--border); height:220px; position:relative; overflow:hidden;">
+                <canvas id="timingCanvas" width="900" height="220" style="width:100%; height:100%;"></canvas>
+            </div>
+
+            <div id="timing-desc-box" style="margin-top:0.75rem; padding:0.85rem; border-radius:6px; background:var(--primary-light); color:var(--primary); font-size:0.88rem; font-weight:600;">
+                Page Read (00h-30h): [CLE High] 00h 명령 ➔ [ALE High] 5바이트 주소 ➔ [CLE High] 30h 래치 ➔ R/B# Low (tR=45μs 셀 판독 대기) ➔ RE# 토글 데이터 출력
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 8: QUIZ ==================== -->
+    <div id="quiz" class="section">
+        <div class="quiz-panel">
+            <div class="quiz-header-bar">
+                <div>
+                    <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:0.25rem;">🎯 Senior Staff NAND Flash 실전 모의고사</h2>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">총 28문항 중 10문제씩 가중치 기반 랜덤 출제</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.1rem; font-weight:800; color:var(--primary);" id="nand-mastery-percent">달성률: 0%</div>
+                    <button class="btn-action" style="padding:0.4rem 0.85rem; font-size:0.8rem; margin-top:0.25rem;" onclick="resetNandQuiz()">진행률 리셋</button>
+                </div>
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="nand-progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="setNandCatFilter('all', this)">전체 모의고사</button>
+                <button class="filter-btn" onclick="setNandCatFilter('phys', this)">셀 물리 & 구조</button>
+                <button class="filter-btn" onclick="setNandCatFilter('levels', this)">SLC~QLC & ISPP</button>
+                <button class="filter-btn" onclick="setNandCatFilter('bics', this)">3D BiCS 다이 구조</button>
+                <button class="filter-btn" onclick="setNandCatFilter('bus', this)">인터페이스 & 타이밍</button>
+                <button class="filter-btn" onclick="setNandCatFilter('noise', this)">물리 결함 & 노이즈</button>
+            </div>
+
+            <!-- Quiz Card -->
+            <div class="quiz-question-box" id="nand-quiz-card">
+                <div class="quiz-meta">
+                    <span class="quiz-q-num" id="nand-q-num">QUESTION 1 / 10</span>
+                    <span class="quiz-q-category" id="nand-q-cat">CELL PHYSICS</span>
+                </div>
+                <div class="quiz-question-title" id="nand-q-title">문제 로딩 중...</div>
+                <div class="quiz-options" id="nand-q-options"></div>
+                <div class="quiz-feedback" id="nand-q-feedback"></div>
+                <div style="margin-top:1.25rem; display:flex; justify-content:flex-end;">
+                    <button class="btn-action" id="btn-nand-next" style="display:none;" onclick="handleNandNextQ()">다음 문제 ➡</button>
+                </div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="quiz-question-box" id="nand-quiz-result" style="display:none; text-align:center; padding:2.5rem 1.5rem;">
+                <div style="font-size:3rem; margin-bottom:0.5rem;">🎉</div>
+                <h2 style="font-size:1.5rem; font-weight:800; margin-bottom:0.5rem;">모의고사 세션 완료!</h2>
+                <p id="nand-session-score" style="font-size:1.1rem; color:var(--text); margin-bottom:1.5rem;">10문제 중 9문제 정답 (정답률 90%)</p>
+                <div style="display:flex; justify-content:center; gap:0.75rem;">
+                    <button class="btn-action" onclick="startNandSession()">새로운 세션 시작 🔄</button>
+                    <button class="btn-action btn-secondary" onclick="switchTab('phys')">개념 복습하러 가기 📖</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>NAND Flash Master: Senior Staff Firmware Engineer Edition • SanDisk/Kioxia BiCS 3D Flash Memory Tech Guide</p>
+    <p style="margin-top:0.35rem; font-size:0.78rem;">Designed for 18-Year Embedded System Leaders & Storage Technical Leads</p>
+</footer>
+
+<script>
+    /* ==========================================================================
+       1. NAVIGATION & THEME LOGIC
+       ========================================================================== */
+    function switchTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        const targetSection = document.getElementById(tabId);
+        const targetBtn = document.getElementById('tab-' + tabId);
+        
+        if (targetSection) targetSection.classList.add('active');
+        if (targetBtn) targetBtn.classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (tabId === 'quiz') {
+            if (!currentNandSession || currentNandSession.length === 0) startNandSession();
+        } else if (tabId === 'sim') {
+            renderNandVth();
+            renderTimingWaveform();
+        }
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('ftl_theme', next);
+        document.getElementById('theme-btn').innerText = next === 'dark' ? '☀️ 라이트모드' : '🌙 다크모드';
+        renderNandVth();
+        renderTimingWaveform();
+    }
+
+    const savedTheme = localStorage.getItem('ftl_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('theme-btn').innerText = savedTheme === 'dark' ? '☀️ 라이트모드' : '🌙 다크모드';
+        updateNandMastery();
+    });
+
+    function navigateNandSection(tabId, elementId) {
+        switchTab(tabId);
+        setTimeout(() => {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('highlight-target');
+                setTimeout(() => el.classList.remove('highlight-target'), 2000);
+            }
+        }, 150);
+    }
+
+    /* ==========================================================================
+       2. NAND QUESTION BANK (28 COMPREHENSIVE QUESTIONS)
+       ========================================================================== */
+    const nandQuestionBank = [
+        // --- Category: phys (셀 물리 & 구조 1~6) ---
+        {
+            id: 101, category: "phys", catLabel: "셀 구조",
+            q: "현대 3D BiCS NAND 플래시가 과거 2D의 Floating Gate(도체) 대신 Charge Trap Flash(CTF, 부도체 질화막)를 사용하는 가장 결정적인 물리적 이유는?",
+            options: [
+                "CTF가 플로팅 게이트보다 제조 단가가 100배 저렴하기 때문에",
+                "산화막에 국소적 결함이 생겨도 도체와 달리 전하 전체가 일제히 방전되지 않고, 셀 간 기생 커패시턴스 간섭이 극소화되어 3D 적층에 최적화되기 때문에",
+                "CTF는 전압 인가 없이도 영구적으로 데이터를 유지할 수 있기 때문에",
+                "CTF는 지우기(Erase) 동작이 전혀 필요 없기 때문에"
+            ],
+            ans: 1, tab: "phys", ref: "phys-ctf",
+            exp: "CTF는 절연체인 Si3N4 질화막 내의 국소 트랩 자리에 전자를 가두므로 단일 결함으로 전하 전체가 방전되는 것을 막고, 셀 간 간섭이 극히 작아 3D 원통형 적층 홀 공정에 필수적입니다."
+        },
+        {
+            id: 102, category: "phys", catLabel: "터널링 물리",
+            q: "NAND 플래시의 쓰기(Program) 동작 시 전자가 얇은 산화막을 뚫고 트랩 층으로 유입되도록 만드는 물리적 현상은?",
+            options: ["Hot Carrier Injection (HCI)", "Fowler-Nordheim (FN) 양자 터널링", "Magnetic Tunnel Junction (MTJ)", "Photoelectric Effect"],
+            ans: 1, tab: "phys", ref: "phys-tunneling",
+            exp: "NAND는 Control Gate에 +15~20V 고전압을 인가하여 산화막 양단에 형성된 강한 삼각 전위 장벽을 전자가 뚫고 지나가는 Fowler-Nordheim (FN) 터널링을 이용합니다."
+        },
+        {
+            id: 103, category: "phys", catLabel: "스트링 판독",
+            q: "NAND Cell String의 특정 워드라인(WL) 셀을 읽기 위해, 나머지 모든 비선택(Unselected) 워드라인에 인가하는 높은 도통 전압의 명칭은?",
+            options: ["Vpgm (Program Voltage)", "Vpass (Pass Voltage)", "Verase (Erase Voltage)", "Vcc"],
+            ans: 1, tab: "phys", ref: "phys-string",
+            exp: "비선택 셀들은 데이터 값(Vth)에 관계없이 무조건 저항이 낮은 켜짐(ON) 상태로 만들어 주어야 하므로 약 6~7V의 높은 Vpass 전압을 인가합니다."
+        },
+        {
+            id: 104, category: "phys", catLabel: "NAND vs NOR",
+            q: "NOR 플래시와 비교할 때 NAND 플래시가 대용량 스토리지(SSD)의 표준으로 독점하게 된 가장 큰 구조적 이유는?",
+            options: [
+                "NAND는 직렬 스트링 구조로 셀 면적이 4F²에 불과하여 동일 면적당 집적도와 가격 경쟁력이 압도적이기 때문에",
+                "NAND는 CPU가 플래시에서 직접 코드를 실행(Execute-in-Place)할 수 있기 때문에",
+                "NAND는 지우기(Erase)를 바이트 단위로 수행할 수 있기 때문에",
+                "NAND의 랜덤 읽기 레이턴시가 NOR보다 100배 빠르기 때문에"
+            ],
+            ans: 0, tab: "phys", ref: "phys-nandnor",
+            exp: "NAND는 셀들이 직렬로 연결되어 접촉 비아가 극소화되므로 셀 크기가 4F²로 작아 극단적인 고집적/저비용 대용량 스토리지를 구현할 수 있습니다."
+        },
+        {
+            id: 105, category: "phys", catLabel: "소거 상태",
+            q: "NAND 플래시 블록을 고전압(Verase ≈ 20V)으로 소거(Erase)했을 때 셀들의 문턱 전압(Vth) 상태는?",
+            options: [
+                "모든 셀의 Vth가 최고 양의 전압(+5V)으로 상승한다.",
+                "트랩 층의 전자가 방출되어 Vth가 음수(Negative, 약 -1V ~ -3V) 상태가 되며 데이터는 1(0xFF)로 인식된다.",
+                "셀이 물리적으로 단선되어 저항이 무한대가 된다.",
+                "셀 전압이 무작위로 0V로 수렴한다."
+            ],
+            ans: 1, tab: "phys", ref: "phys-tunneling",
+            exp: "소거 시 전자가 기판으로 방출되어 셀의 Vth는 음수(Erase State)가 되며, 디지털 로직상 '1'로 판독됩니다."
+        },
+        {
+            id: 106, category: "phys", catLabel: "Gate-All-Around",
+            q: "3D BiCS 낸드에서 원통형 채널 홀(Macaroni Channel)을 Control Gate가 360도 둘러싸는 트랜지스터 구조를 무엇이라 하는가?",
+            options: ["Planar FET", "FinFET", "Gate-All-Around (GAA)", "Bipolar Junction"],
+            ans: 2, tab: "phys", ref: "phys-ctf",
+            exp: "3D CTF 낸드는 원통형 실리콘 채널 기둥 전체를 게이트가 감싸는 Gate-All-Around(GAA) 구조로 우수한 채널 정전 제어 능력을 발휘합니다."
+        },
+
+        // --- Category: levels (셀 레벨 & ISPP 7~12) ---
+        {
+            id: 107, category: "levels", catLabel: "셀 레벨 구분",
+            q: "TLC(Triple Level Cell)와 QLC(Quad Level Cell) 1개 셀이 구분해야 하는 문턱 전압(Vth) 상태의 수는 각각 몇 개인가?",
+            options: ["TLC: 3개, QLC: 4개", "TLC: 6개, QLC: 8개", "TLC: 8개, QLC: 16개", "TLC: 16개, QLC: 32개"],
+            ans: 2, tab: "levels", ref: "level-types",
+            exp: "1개 셀의 비트 수를 N이라 할 때 상태 수는 2ⁿ개입니다. 따라서 TLC(3비트)는 2³=8개, QLC(4비트)는 2⁴=16개 상태를 구분합니다."
+        },
+        {
+            id: 108, category: "levels", catLabel: "ISPP 제어",
+            q: "NAND 프로그래밍 시 목표 전압을 초과하지 않고 정밀하게 전압 분포 폭을 제어하기 위해 펄스 전압을 계단식으로 올려가며 검증하는 알고리즘은?",
+            options: ["ISPP (Incremental Step Pulse Programming)", "Direct Charge Pumping", "Constant Current Stress", "One-Shot High Voltage Write"],
+            ans: 0, tab: "levels", ref: "level-ispp",
+            exp: "ISPP는 작은 스텝 전압(ΔVispp)씩 증가시키며 매 펄스마다 Program Verify(PV)를 수행하는 낸드의 표준 프로그래밍 제어 방식입니다."
+        },
+        {
+            id: 109, category: "levels", catLabel: "ΔVispp 트레이드오프",
+            q: "ISPP 알고리즘에서 스텝 전압 폭(ΔVispp)을 더 잘게 줄일 때 발생하는 결과로 옳은 것은?",
+            options: [
+                "문턱 전압(Vth) 분포 폭이 좁아져 신뢰성이 높아지지만, 프로그래밍 시간(tPROG)이 길어진다.",
+                "프로그래밍 속도가 2배 빨라진다.",
+                "P/E Cycle 수명이 1/10로 단축된다.",
+                "소거(Erase) 시간이 길어진다."
+            ],
+            ans: 0, tab: "levels", ref: "level-ispp",
+            exp: "ΔVispp를 좁히면 정밀한 주입이 가능해져 Vth 피크가 예리해지지만(신뢰성 증가), 반복해야 하는 펄스 루프 수가 증가하여 tPROG가 길어집니다."
+        },
+        {
+            id: 110, category: "levels", catLabel: "Gray Code 배치",
+            q: "NAND Vth 상태 간에 인접한 상태끼리 오직 1개 비트만 차이나도록 코드를 배치(Gray Code)하는 주된 목적은?",
+            options: [
+                "데이터 압축률을 2배로 높이기 위해",
+                "전압 노이즈로 인접 상태로 넘어가더라도 비트 에러 발생을 1비트로 억제하여 ECC 복구를 돕기 위해",
+                "읽기 전류를 0으로 만들기 위해",
+                "낸드 채널 버스 대역폭을 2배로 확장하기 위해"
+            ],
+            ans: 1, tab: "levels", ref: "level-gray",
+            exp: "인접 상태 간에 1비트만 차이나도록 Gray Code를 매핑하면, 노이즈나 Retention으로 인접 상태와 겹쳐도 최대 1비트 에러에 그쳐 LDPC 복구 효율이 극대화됩니다."
+        },
+        {
+            id: 111, category: "levels", catLabel: "논리 페이지 매핑",
+            q: "하나의 TLC 셀에 저장되는 3개 비트가 FTL 및 파일시스템 관점에서 서로 다른 Lower Page, Middle Page, Upper Page로 분산 매핑되는 이유는?",
+            options: [
+                "낸드 핀 수가 부족하기 때문에",
+                "한 번의 읽기로 1개 페이지만 고속으로 읽을 수 있도록 I/O 유연성을 부여하고 워크로드를 분산하기 위해",
+                "모든 페이지의 프로그래밍 속도를 동일하게 맞추기 위해",
+                "SLC 캐시를 영구적으로 제거하기 위해"
+            ],
+            ans: 1, tab: "levels", ref: "level-gray",
+            exp: "한 셀의 비트들을 서로 다른 논리 페이지에 매핑하여 호스트가 4KB/16KB 단위로 독립적인 페이지 읽기/쓰기를 수행할 수 있도록 지원합니다."
+        },
+        {
+            id: 112, category: "levels", catLabel: "Foggy-Fine Program",
+            q: "TLC/QLC에서 인접 셀 간의 기생 커패시턴스 간섭을 최소화하기 위해 전압을 2단계로 나누어 프로그래밍하는 기법은?",
+            options: ["Foggy-Fine (Multi-Pass) Program", "Single-Shot Turbo Program", "Reverse Erase Program", "Bitline Sweep Program"],
+            ans: 0, tab: "levels", ref: "level-gray",
+            exp: "먼저 거친 전압으로 1차 기록(Foggy)한 후, 인접 WL 기록이 끝난 뒤 정밀 전압(Fine)으로 최종 마무리하는 2단계 기법을 Foggy-Fine Program이라고 합니다."
+        },
+
+        // --- Category: bics (3D BiCS 다이 구조 13~17) ---
+        {
+            id: 113, category: "bics", catLabel: "CuA / PUC 기술",
+            q: "3D NAND 다이에서 Row/Col 디코더, 펌프, 페이지 버퍼 등 주변 회로(Peri)를 셀 어레이 하단 기판에 배치하는 CuA(Circuit Under Array) / PUC 기술의 핵심 이점은?",
+            options: [
+                "칩 다이 면적(Die Size)을 약 20~30% 축소하여 웨이퍼당 생산 넷 다이를 극대화한다.",
+                "낸드의 소거 시간을 0으로 만든다.",
+                "컨트롤러의 DRAM을 대체한다.",
+                "Toggle 버스를 무선 통신으로 전환한다."
+            ],
+            ans: 0, tab: "bics", ref: "bics-cua",
+            exp: "CuA/PUC는 면적을 많이 차지하는 주변 회로를 셀 밑으로 깔아버려 칩 면적 효율과 웨이퍼당 생산 칩 수를 극대화하는 핵심 공정입니다."
+        },
+        {
+            id: 114, category: "bics", catLabel: "Multi-Tier Stacking",
+            q: "3D BiCS 낸드가 112단, 162단, 218단 등 초고적층으로 발전하면서 단일 홀 에칭 한계를 극복하기 위해 도입한 공정은?",
+            options: ["Planar Shrinkage", "Multi-Tier (2-Deck) Stacking & Bonding", "Liquid Cooling Etching", "Magnetic Alignment"],
+            ans: 1, tab: "bics", ref: "bics-tiers",
+            exp: "수직 홀 깊이가 너무 깊어지면 상단과 하단의 직경 차이(에칭 한계)가 발생하므로, 2개 이상의 독립 스택을 따로 에칭한 뒤 결합하는 Multi-Tier 접합 기술을 사용합니다."
+        },
+        {
+            id: 115, category: "bics", catLabel: "Multi-Plane 병렬화",
+            q: "단일 낸드 다이 내부에서 2개 또는 4개의 독립 플레인(Dual/Quad Plane)을 동시에 읽거나 프로그래밍할 때 지켜야 하는 일반적인 제약 조건은?",
+            options: [
+                "각 플레인의 블록 번호가 완전히 달라야 한다.",
+                "모든 플레인이 동일한 페이지 오프셋(Row Address)을 공유해야 한다.",
+                "반드시 한 플레인은 Read, 다른 플레인은 Erase여야 한다.",
+                "DRAM 캐시를 4GB 이상 탑재해야 한다."
+            ],
+            ans: 1, tab: "bics", ref: "bics-planes",
+            exp: "Multi-Plane 동시 동작 커맨드는 내부 Row 디코더를 공유하므로 각 플레인에서 동일한 페이지 주소(Row Offset)에 대해 수행되어야 하는 규칙이 있습니다."
+        },
+        {
+            id: 116, category: "bics", catLabel: "CBA 하이브리드 본딩",
+            q: "CMOS 주변 회로 웨이퍼와 3D 셀 어레이 웨이퍼를 각각 별도로 제작한 뒤, 웨이퍼 상태에서 Cu-to-Cu 하이브리드 본딩으로 맞붙이는 최신 기술은?",
+            options: ["CBA (CMOS Directly Bonded to Array)", "Wire Bonding Packaging", "Through-Silicon Via (TSV)", "Solder Bump Flip-chip"],
+            ans: 0, tab: "bics", ref: "bics-cua",
+            exp: "Kioxia/SanDisk BiCS8 등에 적용되는 CBA 기술은 주변 회로와 셀 어레이를 각기 최적 공정으로 제작한 뒤 다이렉트 본딩하여 속도와 밀도를 동시 달성합니다."
+        },
+        {
+            id: 117, category: "bics", catLabel: "2D 낸드의 종말",
+            q: "과거 2D 평면 플래시가 15nm 이하에서 단종되고 3D BiCS로 전환된 물리적 원인이 아닌 것은?",
+            options: [
+                "인접 셀 간 기생 정전용량 결합(Crosstalk) 폭증",
+                "셀당 포획되는 전자의 수가 수십 개에 불과하여 노이즈에 극도로 취약해짐",
+                "초미세 선폭 패터닝을 위한 포토리소그래피 한계 및 누설 전류 급증",
+                "낸드 인터페이스 규격이 PCI Express로 변경되었기 때문에"
+            ],
+            ans: 3, tab: "bics", ref: "bics-evo",
+            exp: "PCIe는 호스트-컨트롤러 인터페이스 표준일 뿐, 2D 평면 낸드의 물리적 스케일링 한계(Crosstalk, 극소 전자 수, 누설 전류)와는 무관합니다."
+        },
+
+        // --- Category: bus (버스 인터페이스 & 타이밍 18~23) ---
+        {
+            id: 118, category: "bus", catLabel: "플래시 제어 핀",
+            q: "NAND 컨트롤러가 명령(Command) 바이트를 낸드 다이에 전달할 때 반드시 HIGH 상태로 올려야 하는 제어 핀은?",
+            options: ["ALE (Address Latch Enable)", "CLE (Command Latch Enable)", "CE# (Chip Enable)", "RE# (Read Enable)"],
+            ans: 1, tab: "bus", ref: "bus-pins",
+            exp: "CLE(Command Latch Enable) 신호가 High일 때 DQ 버스에 실린 바이트가 낸드 내부 커맨드 레지스터에 래치됩니다."
+        },
+        {
+            id: 119, category: "bus", catLabel: "Page Read 시퀀스",
+            q: "일반적인 비동기/DDR 낸드에서 1개 페이지를 읽기 위해 발행하는 표준 커맨드 시퀀스는?",
+            options: [
+                "00h - 5 Cycle Address - 30h",
+                "80h - 5 Cycle Address - 10h",
+                "60h - 3 Cycle Address - D0h",
+                "FFh - Reset"
+            ],
+            ans: 0, tab: "bus", ref: "bus-cmds",
+            exp: "Page Read는 00h 커맨드 ➔ 5사이클 주소 입력 ➔ 30h 확인 커맨드 순서로 발행되며, 이후 R/B#가 Low(Busy)로 떨어져 tR 동안 감지합니다."
+        },
+        {
+            id: 120, category: "bus", catLabel: "Ready/Busy 신호",
+            q: "NAND 다이가 내부적으로 셀 감지(tR)나 블록 소거(tBERS)를 수행 중임을 호스트 컨트롤러에 알리는 오픈 드레인 핀은?",
+            options: ["R/B# (Ready/Busy#)", "WP# (Write Protect)", "DQS", "CLE"],
+            ans: 0, tab: "bus", ref: "bus-pins",
+            exp: "R/B# 핀은 내부 연산 중일 때 Low(Busy)를 유지하고, 작업이 완료되면 High(Ready)로 복귀하여 인터럽트 또는 폴링 신호를 제공합니다."
+        },
+        {
+            id: 121, category: "bus", catLabel: "타이밍 파라미터",
+            q: "NAND 타이밍 파라미터 중 소요 시간이 긴 순서대로 올바르게 나열한 것은? (단, TLC 기준)",
+            options: [
+                "tBERS (지우기) > tPROG (쓰기) > tR (읽기)",
+                "tR (읽기) > tPROG (쓰기) > tBERS (지우기)",
+                "tPROG (쓰기) > tBERS (지우기) > tR (읽기)",
+                "tBERS (지우기) > tR (읽기) > tPROG (쓰기)"
+            ],
+            ans: 0, tab: "bus", ref: "bus-timings",
+            exp: "TLC 기준 소거 시간(tBERS)은 약 5~10ms, 쓰기 시간(tPROG)은 약 1ms, 읽기 시간(tR)은 약 50~80μs로 소거가 읽기보다 수백 배 느립니다."
+        },
+        {
+            id: 122, category: "bus", catLabel: "DQS 스트로브",
+            q: "Toggle DDR 및 고속 ONFI 낸드에서 초당 수천 메가트랜스퍼(MT/s)의 고주파 데이터 전송 시 지터(Jitter)를 억제하기 위해 사용하는 데이터 동기화 신호는?",
+            options: ["DQS (Data Strobe)", "ALE", "WP#", "Vref"],
+            ans: 0, tab: "bus", ref: "bus-protocols",
+            exp: "DQS(Data Strobe)는 고속 DDR 버스에서 데이터 신호(DQ)와 정확히 위상을 맞추어 클럭 에지 타이밍을 동기화하는 차동/단일 스트로브 신호입니다."
+        },
+        {
+            id: 123, category: "bus", catLabel: "Cache Program",
+            q: "이전 페이지가 낸드 물리 셀에 ISPP로 기록되는 동안, 다음 페이지 데이터를 페이지 버퍼 캐시 래치에 미리 로드할 수 있게 해주는 기능은?",
+            options: ["Cache Program (15h)", "Multi-Die Interleave", "Read Retry", "Soft Bit Read"],
+            ans: 0, tab: "bus", ref: "bus-cmds",
+            exp: "Cache Program은 10h 대신 15h 커맨드를 사용하여 낸드 내부 듀얼 래치를 활용해 버스 전송과 셀 쓰기 동작을 오버랩시킵니다."
+        },
+
+        // --- Category: noise (물리 결함 & 노이즈 24~28) ---
+        {
+            id: 124, category: "noise", catLabel: "Read Disturb",
+            q: "특정 워드라인을 읽을 때 비선택 셀들에 인가되는 고전압(Vpass ≈ 6~7V)으로 인해 비선택 셀들의 Vth가 우측으로 이동하는 결함은?",
+            options: ["Read Disturb", "Data Retention", "Temperature Cross", "SILC Breakdown"],
+            ans: 0, tab: "noise", ref: "noise-readdisturb",
+            exp: "Read Disturb는 반복된 읽기 통과 전압(Vpass) 스트레스로 인해 의도치 않게 전자가 유입되는 소프트 프로그램 현상입니다."
+        },
+        {
+            id: 125, category: "noise", catLabel: "Data Retention 열화",
+            q: "전원이 꺼진 SSD를 85°C 고온 환경에 장기간 방치했을 때 발생하는 주요 물리적 현상과 Vth 이동 방향은?",
+            options: [
+                "전하 누설 가속화로 인해 Vth 분포가 좌측(낮은 전압 방향)으로 이동한다.",
+                "전하가 셀로 유입되어 Vth가 우측으로 이동한다.",
+                "셀의 저항이 감소하여 지우기 시간이 빨라진다.",
+                "어떠한 물리적 변화도 발생하지 않는다."
+            ],
+            ans: 0, tab: "noise", ref: "noise-retention",
+            exp: "Data Retention은 시간 경과 및 고온에 의해 트랩 전하가 산화막을 뚫고 누설되므로 Vth가 좌측(낮은 전압)으로 떨어집니다."
+        },
+        {
+            id: 126, category: "noise", catLabel: "Self-Boosting",
+            q: "프로그래밍 시 쓰지 않는 스트링(Inhibited String)의 채널 전위를 인접 WL 전압과의 결합으로 8~10V로 자동 승압시켜 Program Disturb를 방어하는 기법은?",
+            options: ["Self-Boosting", "Negative Charge Pumping", "Gate-Induced Drain Leakage (GIDL)", "Substrate Grounding"],
+            ans: 0, tab: "noise", ref: "noise-pgmdisturb",
+            exp: "Self-Boosting은 플로팅된 채널의 전위를 용량성 결합으로 끌어올려 산화막 양단 전위차를 줄임으로써 Program Disturb를 차단합니다."
+        },
+        {
+            id: 127, category: "noise", catLabel: "SILC 결함",
+            q: "P/E Cycle이 누적되면서 터널 산화막에 격자 결함(Traps)이 생성되어 미세 누설 전류가 흐르고 절연 파괴에 이르는 현상은?",
+            options: ["SILC (Stress-Induced Leakage Current)", "Electromigration", "Hot Carrier Injection", "Latch-up"],
+            ans: 0, tab: "noise", ref: "noise-crosstalk",
+            exp: "SILC는 반복된 고전압 터널링 스트레스로 산화막 내부에 결함이 축적되어 전하 누설과 수명 고갈을 촉진하는 현상입니다."
+        },
+        {
+            id: 128, category: "noise", catLabel: "초기 배드 블록",
+            q: "공장에서 출하된 정품 낸드 다이에 존재하는 초기 배드 블록(Factory Bad Block)을 식별하는 표준 방법은?",
+            options: [
+                "블록 전체를 Erase해 본 후 에러가 나는지 확인한다.",
+                "블록의 첫 번째 또는 마지막 페이지의 스페어 영역(Spare Area) 특정 바이트에 비트 0(Non-FFh)이 기록되어 있는지 스캔한다.",
+                "온도 센서의 온도를 100도까지 올려본다.",
+                "호스트 파일시스템 포맷을 수행한다."
+            ],
+            ans: 1, tab: "char", ref: "char-fbbm",
+            exp: "공장 배드 블록은 스페어 영역 특정 바이트(예: 1st Byte)에 제조사 검사 플래그(00h 등)가 마킹되어 있으므로, 초기 부팅 시 이를 스캔하여 BBT를 구축합니다 (절대 지우면 안 됨)."
+        }
+    ];
+
+    /* ==========================================================================
+       3. SMART WEIGHTED NAND QUIZ ENGINE
+       ========================================================================== */
+    let nandWeights = JSON.parse(localStorage.getItem('nand_senior_weights')) || {};
+    nandQuestionBank.forEach(q => { if (!nandWeights[q.id]) nandWeights[q.id] = 1; });
+
+    let activeNandCat = 'all';
+    let currentNandSession = [];
+    let currentNandQIndex = 0;
+    let nandCorrectCount = 0;
+
+    function setNandCatFilter(cat, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeNandCat = cat;
+        startNandSession();
+    }
+
+    function weightedSelectNand(items, count) {
+        let pool = [...items];
+        let chosen = [];
+        let numToSelect = Math.min(count, pool.length);
+
+        for (let i = 0; i < numToSelect; i++) {
+            let totalW = pool.reduce((acc, item) => acc + (nandWeights[item.id] || 1), 0);
+            let rand = Math.random() * totalW;
+            let running = 0;
+            for (let j = 0; j < pool.length; j++) {
+                running += (nandWeights[pool[j].id] || 1);
+                if (rand <= running) {
+                    chosen.push(pool[j]);
+                    pool.splice(j, 1);
+                    break;
+                }
+            }
+        }
+        return chosen;
+    }
+
+    function startNandSession() {
+        let candidates = nandQuestionBank;
+        if (activeNandCat !== 'all') {
+            candidates = nandQuestionBank.filter(q => q.category === activeNandCat);
+        }
+
+        const sessionSize = Math.min(10, candidates.length);
+        currentNandSession = weightedSelectNand(candidates, sessionSize);
+        currentNandQIndex = 0;
+        nandCorrectCount = 0;
+
+        document.getElementById('nand-quiz-card').style.display = 'block';
+        document.getElementById('nand-quiz-result').style.display = 'none';
+
+        renderNandQ();
+        updateNandMastery();
+    }
+
+    function renderNandQ() {
+        if (!currentNandSession || currentNandSession.length === 0) return;
+
+        const q = currentNandSession[currentNandQIndex];
+        document.getElementById('nand-q-num').innerText = `QUESTION ${currentNandQIndex + 1} / ${currentNandSession.length}`;
+        document.getElementById('nand-q-cat').innerText = q.catLabel;
+        document.getElementById('nand-q-title').innerText = `Q${currentNandQIndex + 1}. ${q.q}`;
+
+        const container = document.getElementById('nand-q-options');
+        container.innerHTML = '';
+
+        const feedbackBox = document.getElementById('nand-q-feedback');
+        feedbackBox.className = 'quiz-feedback';
+        feedbackBox.innerHTML = '';
+        feedbackBox.classList.remove('show');
+
+        document.getElementById('btn-nand-next').style.display = 'none';
+
+        const progressPct = (currentNandQIndex / currentNandSession.length) * 100;
+        document.getElementById('nand-progress-fill').style.width = `${progressPct}%`;
+
+        q.options.forEach((optText, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.innerHTML = `<span style="font-weight:700; color:var(--primary); min-width:24px;">${idx + 1}.</span> <span>${optText}</span>`;
+            btn.onclick = () => submitNandAnswer(idx, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function submitNandAnswer(selectedIndex, selectedBtn) {
+        const q = currentNandSession[currentNandQIndex];
+        const allOptionBtns = document.querySelectorAll('#nand-q-options .quiz-option');
+        allOptionBtns.forEach(b => b.onclick = null);
+
+        const feedbackBox = document.getElementById('nand-q-feedback');
+        const isCorrect = (selectedIndex === q.ans);
+
+        if (isCorrect) {
+            selectedBtn.classList.add('selected-correct');
+            feedbackBox.className = 'quiz-feedback show quiz-feedback-correct';
+            feedbackBox.innerHTML = `
+                <div style="font-weight:800; font-size:1.05rem; margin-bottom:0.4rem; color:var(--success);">✅ 정답입니다!</div>
+                <div style="font-size:0.92rem; line-height:1.5;">${q.exp}</div>
+            `;
+            nandCorrectCount++;
+            nandWeights[q.id] = Math.max(1, (nandWeights[q.id] || 1) - 1);
+        } else {
+            selectedBtn.classList.add('selected-wrong');
+            if (allOptionBtns[q.ans]) allOptionBtns[q.ans].classList.add('show-correct');
+
+            feedbackBox.className = 'quiz-feedback show quiz-feedback-wrong';
+            feedbackBox.innerHTML = `
+                <div style="font-weight:800; font-size:1.05rem; margin-bottom:0.4rem; color:var(--danger);">❌ 오답입니다!</div>
+                <div style="font-size:0.92rem; line-height:1.5; margin-bottom:0.75rem;">${q.exp}</div>
+                <div style="padding-top:0.6rem; border-top:1px dashed var(--border);">
+                    💡 <a href="#" onclick="navigateNandSection('${q.tab}', '${q.ref}'); return false;" style="color:var(--primary); font-weight:700; text-decoration:underline;">관련 핵심 개념 바로가기 (클릭) ➔</a>
+                </div>
+            `;
+            nandWeights[q.id] = (nandWeights[q.id] || 1) + 3;
+        }
+
+        localStorage.setItem('nand_senior_weights', JSON.stringify(nandWeights));
+        document.getElementById('btn-nand-next').style.display = 'inline-flex';
+        updateNandMastery();
+    }
+
+    function handleNandNextQ() {
+        currentNandQIndex++;
+        if (currentNandQIndex < currentNandSession.length) {
+            renderNandQ();
+        } else {
+            document.getElementById('nand-quiz-card').style.display = 'none';
+            document.getElementById('nand-quiz-result').style.display = 'block';
+            document.getElementById('nand-progress-fill').style.width = '100%';
+
+            const pct = Math.round((nandCorrectCount / currentNandSession.length) * 100);
+            document.getElementById('nand-session-score').innerHTML = `
+                총 <strong>${currentNandSession.length}</strong>문제 중 <strong>${nandCorrectCount}</strong>문제 정답<br>
+                <span style="font-size:1.3rem; font-weight:800; color:${pct >= 80 ? 'var(--success)' : 'var(--danger)'};">이번 세션 정답률: ${pct}%</span>
+            `;
+        }
+    }
+
+    function updateNandMastery() {
+        let masteredCount = 0;
+        nandQuestionBank.forEach(q => {
+            if ((nandWeights[q.id] || 1) <= 1) masteredCount++;
+        });
+
+        const overallPct = Math.round((masteredCount / nandQuestionBank.length) * 100);
+        const display = document.getElementById('nand-mastery-percent');
+        if (display) {
+            display.innerText = `이해 달성률: ${overallPct}% (${masteredCount}/${nandQuestionBank.length})`;
+            display.style.color = overallPct === 100 ? 'var(--success)' : 'var(--primary)';
+        }
+    }
+
+    function resetNandQuiz() {
+        if (confirm("모든 낸드 문제의 오답 가중치 및 학습 달성률을 초기화하시겠습니까?")) {
+            nandWeights = {};
+            nandQuestionBank.forEach(q => nandWeights[q.id] = 1);
+            localStorage.setItem('nand_senior_weights', JSON.stringify(nandWeights));
+            startNandSession();
+        }
+    }
+
+    /* ==========================================================================
+       4. INTERACTIVE SIMULATORS
+       ========================================================================== */
+    // --- Simulator 1: Vth Distribution Canvas ---
+    let currentNandMode = 'SLC';
+    let currentNandWear = 0;
+
+    function setNandSimMode(mode) {
+        currentNandMode = mode;
+        const btns = document.querySelectorAll('#sim-vth-box .btn-action');
+        btns.forEach(b => {
+            if (b.innerText.startsWith(mode)) {
+                b.className = 'btn-action';
+            } else if (!b.innerText.includes('리셋')) {
+                b.className = 'btn-action btn-secondary';
+            }
+        });
+        renderNandVth();
+    }
+
+    function updateNandWear(val) {
+        currentNandWear = parseInt(val, 10);
+        document.getElementById('nand-wear-display').innerText = currentNandWear === 0 ? "Fresh (0%)" : `Aging ${currentNandWear}%`;
+        renderNandVth();
+    }
+
+    function renderNandVth() {
+        const canvas = document.getElementById('nandVthCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Ground line
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(30, h - 30);
+        ctx.lineTo(w - 30, h - 30);
+        ctx.stroke();
+
+        let count = 2;
+        if (currentNandMode === 'MLC') count = 4;
+        else if (currentNandMode === 'TLC') count = 8;
+        else if (currentNandMode === 'QLC') count = 16;
+
+        const wearSpread = (currentNandWear / 100) * 16;
+        const baseSigma = Math.max(8, (w * 0.75) / (count * 3.8)) + wearSpread;
+
+        const step = (w - 120) / (count);
+
+        for (let i = 0; i < count; i++) {
+            let cx = 60 + i * step + step * 0.5;
+            let peakH = h * 0.65;
+            let color = i === 0 ? '#10b981' : (currentNandWear > 60 ? '#ef4444' : '#0891b2');
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = cx - baseSigma * 3.5; x <= cx + baseSigma * 3.5; x++) {
+                let dx = (x - cx) / baseSigma;
+                let y = (h - 30) - peakH * Math.exp(-0.5 * dx * dx);
+                if (x === Math.round(cx - baseSigma * 3.5)) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = count <= 8 ? 'bold 11px monospace' : '9px monospace';
+            let label = i === 0 ? 'Erase' : `P${i}`;
+            ctx.fillText(label, cx - 8, h - 14);
+        }
+
+        // Margin status text
+        const statusBox = document.getElementById('nand-margin-status');
+        if (currentNandWear > 60 && count >= 8) {
+            statusBox.style.color = 'var(--danger)';
+            statusBox.innerHTML = `❌ <strong>상태 간 Vth 중첩 발생 (Vth Overlap)!</strong> 고온 노화 및 마모로 인접 상태가 겹쳐 LDPC ECC 디코딩 필수 (RBER 임계 근접)`;
+        } else if (currentNandWear > 30) {
+            statusBox.style.color = 'var(--warning)';
+            statusBox.innerHTML = `⚠️ <strong>노이즈 마진 축소 경고:</strong> LDPC Hard Decision 보정 가동 중 (정상 읽기 복구 가능)`;
+        } else {
+            statusBox.style.color = 'var(--success)';
+            statusBox.innerHTML = `✅ <strong>노이즈 마진(Noise Margin) 충분:</strong> RBER 10⁻⁸ 미만 (Zero ECC Correction)`;
+        }
+    }
+
+    // --- Simulator 2: Bus Timing Waveform ---
+    let currentTimingSeq = 'READ';
+
+    function setTimingSeq(seq) {
+        currentTimingSeq = seq;
+        const btns = document.querySelectorAll('#sim-timing-box .btn-action');
+        btns.forEach(b => {
+            if (b.innerText.includes(seq === 'READ' ? 'Read' : (seq === 'PROG' ? 'Program' : 'Erase'))) {
+                b.className = 'btn-action';
+            } else {
+                b.className = 'btn-action btn-secondary';
+            }
+        });
+
+        const desc = document.getElementById('timing-desc-box');
+        if (seq === 'READ') {
+            desc.innerHTML = `<strong>Page Read (00h-30h):</strong> [CLE High] 00h 명령 ➔ [ALE High] 5바이트 주소 ➔ [CLE High] 30h 래치 ➔ R/B# Low (tR=45μs 셀 판독 대기) ➔ RE# 토글 데이터 출력`;
+        } else if (seq === 'PROG') {
+            desc.innerHTML = `<strong>Page Program (80h-10h):</strong> [CLE High] 80h 명령 ➔ [ALE High] 5바이트 주소 ➔ [WE# 토글] 데이터 입력 ➔ [CLE High] 10h 실행 ➔ R/B# Low (tPROG=1200μs 기록 대기) ➔ Status 70h`;
+        } else {
+            desc.innerHTML = `<strong>Block Erase (60h-D0h):</strong> [CLE High] 60h 명령 ➔ [ALE High] 3바이트 블록 Row 주소 ➔ [CLE High] D0h 실행 ➔ R/B# Low (tBERS=5ms 소거 대기) ➔ Status 70h`;
+        }
+
+        renderTimingWaveform();
+    }
+
+    function renderTimingWaveform() {
+        const canvas = document.getElementById('timingCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const signals = ["CLE", "ALE", "WE#", "RE#", "R/B#", "DQ"];
+        const rowH = h / signals.length;
+
+        ctx.font = 'bold 11px monospace';
+
+        signals.forEach((sig, idx) => {
+            let y = idx * rowH + rowH * 0.7;
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillText(sig.padEnd(5, ' '), 15, y);
+
+            // Baseline
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(60, y + 2);
+            ctx.lineTo(w - 20, y + 2);
+            ctx.stroke();
+        });
+
+        ctx.lineWidth = 2;
+
+        function drawWave(sigIdx, segments, color = '#38bdf8') {
+            let baseY = sigIdx * rowH + rowH * 0.7;
+            let highY = baseY - rowH * 0.45;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            let curX = 60;
+            segments.forEach(seg => {
+                let targetY = seg.val === 1 ? highY : baseY;
+                ctx.lineTo(curX, targetY);
+                curX += seg.len;
+                ctx.lineTo(curX, targetY);
+            });
+            ctx.stroke();
+        }
+
+        if (currentTimingSeq === 'READ') {
+            // CLE
+            drawWave(0, [{val:1, len:40}, {val:0, len:100}, {val:1, len:40}, {val:0, len:400}]);
+            // ALE
+            drawWave(1, [{val:0, len:40}, {val:1, len:100}, {val:0, len:440}]);
+            // WE# (Active Low)
+            drawWave(2, [{val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:440}]);
+            // RE# (Data out)
+            drawWave(3, [{val:1, len:380}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:100}]);
+            // R/B#
+            drawWave(4, [{val:1, len:190}, {val:0, len:180}, {val:1, len:210}], '#ef4444');
+            // DQ text bus
+            ctx.fillStyle = '#fde68a';
+            ctx.fillText("[00h]", 65, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[Addr 5-Cycles]", 110, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[30h]", 210, 5 * rowH + rowH * 0.6);
+            ctx.fillText("<--- tR Sensing Wait --->", 270, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[D0 D1 D2... Data Out]", 460, 5 * rowH + rowH * 0.6);
+        } else if (currentTimingSeq === 'PROG') {
+            drawWave(0, [{val:1, len:40}, {val:0, len:180}, {val:1, len:40}, {val:0, len:320}]);
+            drawWave(1, [{val:0, len:40}, {val:1, len:100}, {val:0, len:440}]);
+            drawWave(2, [{val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:440}]);
+            drawWave(3, [{val:1, len:580}]);
+            drawWave(4, [{val:1, len:270}, {val:0, len:200}, {val:1, len:110}], '#ef4444');
+            ctx.fillStyle = '#fde68a';
+            ctx.fillText("[80h]", 65, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[Addr 5-Cycles]", 110, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[Data In Bytes...]", 210, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[10h]", 295, 5 * rowH + rowH * 0.6);
+            ctx.fillText("<--- tPROG ISPP Pulse Wait --->", 350, 5 * rowH + rowH * 0.6);
+        } else {
+            drawWave(0, [{val:1, len:40}, {val:0, len:80}, {val:1, len:40}, {val:0, len:420}]);
+            drawWave(1, [{val:0, len:40}, {val:1, len:80}, {val:0, len:460}]);
+            drawWave(2, [{val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:20}, {val:0, len:20}, {val:1, len:480}]);
+            drawWave(3, [{val:1, len:580}]);
+            drawWave(4, [{val:1, len:170}, {val:0, len:280}, {val:1, len:130}], '#ef4444');
+            ctx.fillStyle = '#fde68a';
+            ctx.fillText("[60h]", 65, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[Row Addr]", 110, 5 * rowH + rowH * 0.6);
+            ctx.fillText("[D0h]", 170, 5 * rowH + rowH * 0.6);
+            ctx.fillText("<------- tBERS Block Erase Wait (5~10ms) ------->", 230, 5 * rowH + rowH * 0.6);
+        }
+    }
+</script>
+
+</body>
+</html>
+
